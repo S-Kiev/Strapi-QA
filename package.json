@@ -1,0 +1,31 @@
+{
+  "name": "backend-strapi-bot",
+  "private": true,
+  "version": "0.1.0",
+  "description": "A Strapi application",
+  "scripts": {
+    "develop": "strapi develop",
+    "start": "strapi start",
+    "build": "strapi build",
+    "strapi": "strapi"
+  },
+  "dependencies": {
+    "@strapi/plugin-i18n": "4.14.4",
+    "@strapi/plugin-users-permissions": "4.14.4",
+    "@strapi/provider-upload-cloudinary": "^4.14.4",
+    "@strapi/strapi": "4.14.4",
+    "pg": "^8.8.0",
+    "pg-connection-string": "^2.6.2"
+  },
+  "author": {
+    "name": "A Strapi developer"
+  },
+  "strapi": {
+    "uuid": "f3716101-b3e1-42a6-8f3d-1ea4d3525520"
+  },
+  "engines": {
+    "node": ">=16.0.0 <=20.x.x",
+    "npm": ">=6.0.0"
+  },
+  "license": "MIT"
+}

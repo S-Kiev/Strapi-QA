@@ -1,4 +1,3 @@
-
 const bcrypt = require('bcrypt');
 const { generateCode } = require('./generateCode');
 const { sendCodeWhatsApp } = require('./sendCodeWhatsapp');
@@ -21,6 +20,7 @@ module.exports = (plugin) => {
                     },
                 }).then( async (res)=>{
 
+                    console.log(res);
 
                     if ( res.confirmed && !res.blocked ) {
 
@@ -32,9 +32,10 @@ module.exports = (plugin) => {
                             }
                         }).then( async (res) =>{
 
+                            //Asegurarse que el codigo generado no se haya generado antes
                             const code = generateCode();
                             const validSince = new Date().getTime();
-                            const validUntil = validSince + 300000;
+                            const validUntil = validSince + 90000;
 
                             const number = res.numero;
 
@@ -47,15 +48,13 @@ module.exports = (plugin) => {
 
 
                             await strapi.db.query('api::info-user.info-user').create({data : infoCode})
-                            .then((res)=>{
+                            .then( async (res)=>{
                                 try {
-                                    sendCodeWhatsApp(infoCode.code, number);
+                                    await sendCodeWhatsApp(infoCode.code, number);
                                     ctx.response.status = 200;
                                     ctx.response.body = {
                                         message: `Operacion ejecutada correctamente`,
                                         userId : userId,
-                                        code : code,
-                                        number: number
                                     };
                                 } catch (error) {
                                     console.log(error);
@@ -108,7 +107,8 @@ module.exports = (plugin) => {
 plugin.controllers.user.changePasswordByWhatsapp = async (ctx) => {
 
     console.log(ctx.request.body);
-    if ( ctx.request.body || ctx.request.body.code || ctx.request.body.newPassword || ctx.request.body.id ){
+    if ( ctx.request.body && ctx.request.body.code && ctx.request.body.newPassword && ctx.request.body.id ){
+        //Fijarse cuando se cree la tabla en este proyecto el nombre correcto de la api 
         await strapi.db.query('api::info-user.info-user').findOne({
             where: { code: ctx.request.body.code }
         }).then( async (res)=>{
@@ -118,6 +118,7 @@ plugin.controllers.user.changePasswordByWhatsapp = async (ctx) => {
             const validUntil = new Date(res.validUntil);
 
             if(moment > validSince && moment < validUntil){
+
                 const password = bcrypt.hashSync(ctx.request.body.newPassword , 10);
 
                 await strapi.query('plugin::users-permissions.user').update({
@@ -125,6 +126,7 @@ plugin.controllers.user.changePasswordByWhatsapp = async (ctx) => {
                     data: { password },
                 }).then((res)=>{
        
+                    //No se nesecita
                     const jwtToken = strapi.plugins['users-permissions'].services.jwt.issue({
                         id: ctx.request.body.id
                     });

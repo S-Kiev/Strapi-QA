@@ -1,6 +1,5 @@
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
-const { generateCode } = require('./generateCode');
 const { sendCodeWhatsApp } = require('./sendCodeWhatsapp');
 
 module.exports = (plugin) => {
@@ -33,14 +32,20 @@ module.exports = (plugin) => {
                             }
                         }).then( async (res) =>{
 
-                            //Asegurarse que el codigo generado no se haya generado antes
-                            const code = generateCode();
-                            //const randomBytes = crypto.randomBytes(3);
-                            //const code = randomBytes.toString('hex').slice(0, 6);
-                            //console.log(code);
+                            let code
+                            let sameCode
 
+                            do {
+                                const randomBytes = crypto.randomBytes(3);
+                                code = randomBytes.toString('hex').slice(0, 6);
+    
+                                sameCode = await strapi.db.query('api::info-user.info-user').findOne({
+                                    where : {
+                                        code : code,
+                                    }
+                                });
 
-
+                            } while (sameCode)
 
 
                             const validSince = new Date().getTime();
@@ -62,21 +67,21 @@ module.exports = (plugin) => {
                             .then( async (res)=>{
                                 try {
                                     await sendCodeWhatsApp(infoCode.code, number);
-                                    ctx.response.status = 200;
+                                    ctx.response.status = 201;
                                     ctx.response.body = {
                                         message: `Operacion ejecutada correctamente`,
                                         userId : userId,
                                     };
                                 } catch (error) {
                                     console.log(error);
-                                    ctx.response.status = 401;
+                                    ctx.response.status = 405;
                                     ctx.body = {
                                         message: `No se pudo enviar el código por WhatsApp`,
                                     };
                                 }
                             }).catch((error)=>{
                                 console.log(error);
-                                ctx.response.status = 401;
+                                ctx.response.status = 405;
                                 ctx.body = {
                                     message: `No se pudo crear registro de recuperacion de contraseña`,
                                 };
@@ -85,13 +90,13 @@ module.exports = (plugin) => {
 
                         }).catch((error) =>{
                             console.log(error);
-                            ctx.response.status = 401;
+                            ctx.response.status = 405;
                             ctx.body = {
                                 message: `No se encontro un número de telefono asociado a este usuario`,
                             };
                         })
                     } else {
-                        ctx.response.status = 401;
+                        ctx.response.status = 405;
                         ctx.response.body = {
                             message: `Usuario bloquedo o sin confirmar`,
                         };
@@ -99,14 +104,14 @@ module.exports = (plugin) => {
 
                 }).catch ((error)=>{
                     console.log(error);
-                    ctx.response.status = 401;
+                    ctx.response.status = 405;
                     ctx.body = {
                         message: `Usuario incorrecto`,
                     };
                 });
 
     } else {
-        ctx.response.status = 401;
+        ctx.response.status = 405;
         ctx.body = {
         message: `Se requiere un numero, username, o email`
         };
@@ -142,7 +147,7 @@ plugin.controllers.user.changePasswordByWhatsapp = async (ctx) => {
                         id: ctx.request.body.id
                     });
                    
-                    ctx.response.status = 200;
+                    ctx.response.status = 201;
                     ctx.response.body = ({
                         jwtToken,
                         user: res,
@@ -150,13 +155,13 @@ plugin.controllers.user.changePasswordByWhatsapp = async (ctx) => {
     
                 }).catch ((error)=>{
                     console.log(error);
-                    ctx.response.status = 401;
+                    ctx.response.status = 405;
                     ctx.body = {
                         message: `No se pudo actualizar al Usuario`,
                     };
                 });
             } else {
-                ctx.response.status = 401;
+                ctx.response.status = 405;
                 ctx.body = {
                     message: `Su código ha expirado, vuelva a solicitar otro`,
                 };
@@ -166,13 +171,13 @@ plugin.controllers.user.changePasswordByWhatsapp = async (ctx) => {
 
 
         }).catch((error)=>{
-            ctx.response.status = 401;
+            ctx.response.status = 405;
             ctx.body = {
             message: `código incorrecto`
             };
         })
     } else {
-        ctx.response.status = 401;
+        ctx.response.status = 400;
         ctx.body = {
         message: `Solicitud mal formulada`
         };

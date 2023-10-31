@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 const { generateCode } = require('./generateCode');
 const { sendCodeWhatsApp } = require('./sendCodeWhatsapp');
 
@@ -34,8 +35,18 @@ module.exports = (plugin) => {
 
                             //Asegurarse que el codigo generado no se haya generado antes
                             const code = generateCode();
+                            //const randomBytes = crypto.randomBytes(3);
+                            //const code = randomBytes.toString('hex').slice(0, 6);
+                            //console.log(code);
+
+
+
+
+
                             const validSince = new Date().getTime();
                             const validUntil = validSince + 90000;
+
+
 
                             const number = res.numero;
 

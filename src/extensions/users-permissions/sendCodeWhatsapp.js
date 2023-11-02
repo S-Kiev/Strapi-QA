@@ -12,7 +12,7 @@ async function sendCodeWhatsApp (code, number) {
       let config = {
         method: 'post',
         maxBodyLength: Infinity,
-        url: 'https://whatsapp-bot-node-production.up.railway.app/sendCode',
+        url: 'https://bot-whatsapp-openai-production.up.railway.app/sendCode',
         headers: {
           'Content-Type': 'application/json'
         },

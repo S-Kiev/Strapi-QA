@@ -362,121 +362,6 @@ export interface AdminTransferTokenPermission extends Schema.CollectionType {
   };
 }
 
-export interface ApiCityCity extends Schema.CollectionType {
-  collectionName: 'cities';
-  info: {
-    singularName: 'city';
-    pluralName: 'cities';
-    displayName: 'city';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    cityId: Attribute.UID;
-    cityName: Attribute.String & Attribute.Required & Attribute.Unique;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<'api::city.city', 'oneToOne', 'admin::user'> &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<'api::city.city', 'oneToOne', 'admin::user'> &
-      Attribute.Private;
-  };
-}
-
-export interface ApiEquipmentEquipment extends Schema.CollectionType {
-  collectionName: 'equipments';
-  info: {
-    singularName: 'equipment';
-    pluralName: 'equipments';
-    displayName: 'equipment';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    equipmentId: Attribute.UID;
-    name: Attribute.String & Attribute.Required;
-    brand: Attribute.String & Attribute.Required;
-    description: Attribute.Text;
-    deactivationDate: Attribute.DateTime;
-    availabilityStatus: Attribute.Enumeration<
-      ['available', 'rented', 'broken', 'out of use']
-    > &
-      Attribute.Required &
-      Attribute.DefaultTo<'available'>;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'api::equipment.equipment',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'api::equipment.equipment',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
-export interface ApiUserDataUserData extends Schema.CollectionType {
-  collectionName: 'users_data';
-  info: {
-    singularName: 'user-data';
-    pluralName: 'users-data';
-    displayName: 'userData';
-    description: '';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    userId: Attribute.UID;
-    name: Attribute.String & Attribute.Required;
-    lastname: Attribute.String & Attribute.Required;
-    document: Attribute.String & Attribute.Required;
-    cellphone: Attribute.String & Attribute.Required;
-    adminUser: Attribute.Relation<
-      'api::user-data.user-data',
-      'oneToOne',
-      'admin::user'
-    >;
-    city: Attribute.Relation<
-      'api::user-data.user-data',
-      'oneToOne',
-      'api::city.city'
-    >;
-    address: Attribute.String & Attribute.Required;
-    state: Attribute.Enumeration<['enabled', 'locked', 'low']> &
-      Attribute.Required &
-      Attribute.DefaultTo<'enabled'>;
-    deactivationDate: Attribute.DateTime;
-    activeHoursSince: Attribute.DateTime;
-    activeHoursUntil: Attribute.DateTime;
-    daysActiveHours: Attribute.JSON;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'api::user-data.user-data',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'api::user-data.user-data',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
 export interface PluginUploadFile extends Schema.CollectionType {
   collectionName: 'files';
   info: {
@@ -792,6 +677,202 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
   };
 }
 
+export interface ApiCityCity extends Schema.CollectionType {
+  collectionName: 'cities';
+  info: {
+    singularName: 'city';
+    pluralName: 'cities';
+    displayName: 'city';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    cityId: Attribute.UID;
+    cityName: Attribute.String & Attribute.Required & Attribute.Unique;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<'api::city.city', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<'api::city.city', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+  };
+}
+
+export interface ApiConsultingRoomConsultingRoom extends Schema.CollectionType {
+  collectionName: 'consulting_rooms';
+  info: {
+    singularName: 'consulting-room';
+    pluralName: 'consulting-rooms';
+    displayName: 'consultingRoom';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    consultingRoomId: Attribute.UID;
+    name: Attribute.String & Attribute.Required;
+    description: Attribute.Text;
+    availabilityStatus: Attribute.Enumeration<
+      ['available', 'occupied', 'in use', 'out of service']
+    > &
+      Attribute.DefaultTo<'available'>;
+    necessaryAction: Attribute.Text;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::consulting-room.consulting-room',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::consulting-room.consulting-room',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiEquipmentEquipment extends Schema.CollectionType {
+  collectionName: 'equipments';
+  info: {
+    singularName: 'equipment';
+    pluralName: 'equipments';
+    displayName: 'equipment';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    equipmentId: Attribute.UID;
+    name: Attribute.String & Attribute.Required;
+    brand: Attribute.String & Attribute.Required;
+    description: Attribute.Text;
+    deactivationDate: Attribute.DateTime;
+    availabilityStatus: Attribute.Enumeration<
+      ['available', 'rented', 'broken', 'out of use']
+    > &
+      Attribute.Required &
+      Attribute.DefaultTo<'available'>;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::equipment.equipment',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::equipment.equipment',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiTreatmentTreatment extends Schema.CollectionType {
+  collectionName: 'treatments';
+  info: {
+    singularName: 'treatment';
+    pluralName: 'treatments';
+    displayName: 'treatment';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    treatmentId: Attribute.UID;
+    name: Attribute.String & Attribute.Required;
+    description: Attribute.Text;
+    equipments: Attribute.Relation<
+      'api::treatment.treatment',
+      'oneToMany',
+      'api::equipment.equipment'
+    >;
+    deactivationDate: Attribute.DateTime;
+    consultingRooms: Attribute.Relation<
+      'api::treatment.treatment',
+      'oneToMany',
+      'api::consulting-room.consulting-room'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::treatment.treatment',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::treatment.treatment',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiUserDataUserData extends Schema.CollectionType {
+  collectionName: 'users_data';
+  info: {
+    singularName: 'user-data';
+    pluralName: 'users-data';
+    displayName: 'userData';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    userId: Attribute.UID;
+    name: Attribute.String & Attribute.Required;
+    lastname: Attribute.String & Attribute.Required;
+    document: Attribute.String & Attribute.Required;
+    cellphone: Attribute.String & Attribute.Required;
+    adminUser: Attribute.Relation<
+      'api::user-data.user-data',
+      'oneToOne',
+      'admin::user'
+    >;
+    city: Attribute.Relation<
+      'api::user-data.user-data',
+      'oneToOne',
+      'api::city.city'
+    >;
+    address: Attribute.String & Attribute.Required;
+    state: Attribute.Enumeration<['enabled', 'locked', 'low']> &
+      Attribute.Required &
+      Attribute.DefaultTo<'enabled'>;
+    deactivationDate: Attribute.DateTime;
+    activeHoursSince: Attribute.DateTime;
+    activeHoursUntil: Attribute.DateTime;
+    daysActiveHours: Attribute.JSON;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::user-data.user-data',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::user-data.user-data',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 declare module '@strapi/types' {
   export module Shared {
     export interface ContentTypes {
@@ -802,15 +883,17 @@ declare module '@strapi/types' {
       'admin::api-token-permission': AdminApiTokenPermission;
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
-      'api::city.city': ApiCityCity;
-      'api::equipment.equipment': ApiEquipmentEquipment;
-      'api::user-data.user-data': ApiUserDataUserData;
       'plugin::upload.file': PluginUploadFile;
       'plugin::upload.folder': PluginUploadFolder;
       'plugin::i18n.locale': PluginI18NLocale;
       'plugin::users-permissions.permission': PluginUsersPermissionsPermission;
       'plugin::users-permissions.role': PluginUsersPermissionsRole;
       'plugin::users-permissions.user': PluginUsersPermissionsUser;
+      'api::city.city': ApiCityCity;
+      'api::consulting-room.consulting-room': ApiConsultingRoomConsultingRoom;
+      'api::equipment.equipment': ApiEquipmentEquipment;
+      'api::treatment.treatment': ApiTreatmentTreatment;
+      'api::user-data.user-data': ApiUserDataUserData;
     }
   }
 }

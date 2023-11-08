@@ -1,0 +1,39 @@
+{
+  "kind": "collectionType",
+  "collectionName": "consulting_rooms",
+  "info": {
+    "singularName": "consulting-room",
+    "pluralName": "consulting-rooms",
+    "displayName": "consultingRoom"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "consultingRoomId": {
+      "type": "uid"
+    },
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "availabilityStatus": {
+      "type": "enumeration",
+      "enum": [
+        "available",
+        "occupied",
+        "in use",
+        "out of service"
+      ],
+      "default": "available",
+      "required": false
+    },
+    "necessaryAction": {
+      "type": "text"
+    }
+  }
+}

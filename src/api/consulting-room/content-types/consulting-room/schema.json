@@ -1,0 +1,29 @@
+{
+  "kind": "collectionType",
+  "collectionName": "consulting_rooms",
+  "info": {
+    "singularName": "consulting-room",
+    "pluralName": "consulting-rooms",
+    "displayName": "consultingRoom",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "consultingRoomId": {
+      "type": "uid"
+    },
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "necessaryAction": {
+      "type": "text"
+    }
+  }
+}

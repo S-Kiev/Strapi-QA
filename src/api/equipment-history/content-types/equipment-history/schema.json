@@ -1,0 +1,39 @@
+{
+  "kind": "collectionType",
+  "collectionName": "equipment_histories",
+  "info": {
+    "singularName": "equipment-history",
+    "pluralName": "equipment-histories",
+    "displayName": "equipmentHistory"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "equipmentHistoryId": {
+      "type": "uid"
+    },
+    "equipment": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::equipment.equipment"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "available",
+        "occupied",
+        "rented",
+        "broken",
+        "out of use"
+      ]
+    },
+    "since": {
+      "type": "datetime"
+    },
+    "until": {
+      "type": "datetime"
+    }
+  }
+}

@@ -1173,6 +1173,49 @@ export interface ApiMeasurementsCustomerMeasurementsCustomer
   };
 }
 
+export interface ApiRecoveryCodeRecoveryCode extends Schema.CollectionType {
+  collectionName: 'recovery_codes';
+  info: {
+    singularName: 'recovery-code';
+    pluralName: 'recovery-codes';
+    displayName: 'Recovery Code';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    Code: Attribute.String &
+      Attribute.Required &
+      Attribute.SetMinMaxLength<{
+        minLength: 5;
+        maxLength: 7;
+      }>;
+    validSince: Attribute.DateTime;
+    validUntil: Attribute.DateTime;
+    user_datum: Attribute.Relation<
+      'api::recovery-code.recovery-code',
+      'oneToOne',
+      'api::user-data.user-data'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::recovery-code.recovery-code',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::recovery-code.recovery-code',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiTreatmentTreatment extends Schema.CollectionType {
   collectionName: 'treatments';
   info: {
@@ -1298,6 +1341,7 @@ declare module '@strapi/types' {
       'api::equipment.equipment': ApiEquipmentEquipment;
       'api::equipment-history.equipment-history': ApiEquipmentHistoryEquipmentHistory;
       'api::measurements-customer.measurements-customer': ApiMeasurementsCustomerMeasurementsCustomer;
+      'api::recovery-code.recovery-code': ApiRecoveryCodeRecoveryCode;
       'api::treatment.treatment': ApiTreatmentTreatment;
       'api::user-data.user-data': ApiUserDataUserData;
     }

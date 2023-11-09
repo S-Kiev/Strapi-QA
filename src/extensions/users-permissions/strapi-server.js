@@ -1,79 +1,187 @@
-let ultimateCode = '';
-let validate = 0;
-let user;
-
-const { generateCode } = require('./generateCode');
+const bcrypt = require('bcrypt');
+const crypto = require('crypto');
+const { sendCodeWhatsApp } = require('./sendCodeWhatsapp');
 
 module.exports = (plugin) => {
 
   plugin.controllers.user.sendCode = async (ctx) => {
 
-    //Podria buscar y validar el numero de telefono cuando tenga la tabla infoUsuario
-    if ( !ctx.request.body.number ) {
-
-            if ( !ctx.request.body.username || !ctx.request.body.email ) {
-                const user = await strapi.query('plugin::users-permissions.user').findOne({
+            if ( ctx.request.body.username || ctx.request.body.email ) {
+                await strapi.query('plugin::users-permissions.user').findOne({
                     where: {
                         $or: [
                         {
                             username: { $eqi : ctx.request.body.username },
                         },
                         {
-                            createdAt: { $eqi : ctx.request.body.email },
+                            email: { $eqi : ctx.request.body.email },
                         },
                         ],
                     },
+                }).then( async (res)=>{
+
+                    if ( res.confirmed && !res.blocked ) {
+
+                        const userId = res.id;
+
+                        await strapi.db.query('api::user-data.user-data').findOne({
+                            where : {
+                                id : res.id,
+                            }
+                        }).then( async (res) =>{
+
+                            let code
+                            let sameCode
+
+
+                            do {
+                                const randomBytes = crypto.randomBytes(3);
+                                console.log(randomBytes);
+                                code = randomBytes.toString('hex').slice(0, 6);
+                                console.log(code);
+
+
+                                sameCode = await strapi.db.query('api::recovery-code.recovery-code').findOne({
+                                    where : {
+                                        code : code,
+                                    }
+                                });
+                            } while (sameCode)
+
+                            const validSince = new Date().getTime();
+                            const validUntil = validSince + 90000;
+
+                            const number = res.cellphone;
+                            
+
+                            const infoCode = {
+                                Code : code,
+                                //La tabla tiene una relacion 0 a 1 users_data
+                                user_id : res.id,
+                                validSince : validSince,
+                                validUntil : validUntil,
+                            }
+
+
+                            await strapi.db.query('api::recovery-code.recovery-code').create({data : infoCode})
+                            .then( async (res)=>{
+                                try {
+                                    console.log(code);
+                                    console.log(infoCode.Code);
+
+                                    await sendCodeWhatsApp(code, number);
+
+                                    const jwtToken = strapi.plugins['users-permissions'].services.jwt.issue({
+                                        id: res.id
+                                    });
+
+                                    ctx.response.status = 200;
+                                    ctx.response.body = {
+                                        jwtToken,
+                                        message: `Operacion ejecutada correctamente`,
+                                        userId : userId,
+                                    };
+                                } catch (error) {
+                                    console.log(error);
+                                    ctx.response.status = 405;
+                                    ctx.body = {
+                                        message: `No se pudo enviar el código por WhatsApp`,
+                                    };
+                                }
+                            }).catch((error)=>{
+                                console.log(error);
+                                ctx.response.status = 405;
+                                ctx.body = {
+                                    message: `No se pudo crear registro de recuperacion de contraseña`,
+                                };
+                            });
+
+
+                        }).catch((error) =>{
+                            console.log(error);
+                            ctx.response.status = 405;
+                            ctx.body = {
+                                message: `No se encontro un número de telefono asociado a este usuario`,
+                            };
+                        })
+                    } else {
+                        ctx.response.status = 405;
+                        ctx.response.body = {
+                            message: `Usuario bloquedo o sin confirmar`,
+                        };
+                    }
+
+                }).catch ((error)=>{
+                    console.log(error);
+                    ctx.response.status = 405;
+                    ctx.body = {
+                        message: `Usuario incorrecto`,
+                    };
                 });
 
-                //Aqui buscar el numero de Usuario en la tabla infoUsuario
-
-                if (user == undefined || user == null) {
-                    ctx.response.status = 401;
-                    ctx.response.body = {
-                    message: `Usuario incorrecto`
-                    };
-                } else {
-                    const code = generateCode();
-
-                    //Aqui si ya tengo el usuario y codigo guardar esos datos en una tabla junto con el manejo del tiempo para validez
-                    //validate = new Date().getTime() + 60 * 60 * 1000;
-    
-                    //Aqui enviar el codigo por Whatsapp
-
-                    ctx.response.status = 200;
-                    ctx.response.body = {
-                        message: `Operacion ejecutada correctamente`,
-                        code : code,
-                        user: user.id
-                    };
-
-
-
-                }
-
-        } else {
-            ctx.response.status = 401;
-            ctx.body = {
-            message: `Se requiere numero de telefono`
-            };
-        }
+    } else {
+        ctx.response.status = 405;
+        ctx.body = {
+        message: `Se requiere un numero, username, o email`
+        };
     }
 }
-plugin.controllers.user.validateCode = async (ctx) => {
 
-    if ( !ctx.request.body.code || !ctx.request.body.newPassword) {
 
-        //Con el codigo busco en la tabla (idUser, code, validSince, validUntil) el id del usuario
-        //enviar el id de Usuario y la new Password para que Frontend use el update
-        ctx.response.status = 200;
-        ctx.response.body = {
-            message: `Operacion ejecutada correctamente`
-        };
 
+plugin.controllers.user.changePasswordByWhatsapp = async (ctx) => {
+
+    console.log(ctx.request.body);
+    if ( ctx.request.body && ctx.request.body.code && ctx.request.body.newPassword && ctx.request.body.id ){
+        await strapi.db.query('api::recovery-code.recovery-code').findOne({
+            where: { code: ctx.request.body.code }
+        }).then( async (res)=>{
+
+            const moment = new Date();
+            const validSince = new Date(res.validSince);
+            const validUntil = new Date(res.validUntil);
+
+            if(moment > validSince && moment < validUntil){
+
+                const password = bcrypt.hashSync(ctx.request.body.newPassword , 10);
+
+                await strapi.query('plugin::users-permissions.user').update({
+                    where: { id: ctx.request.body.id },
+                    data: { password },
+                }).then((res)=>{
+              
+                    ctx.response.status = 201;
+                    ctx.response.body = ({
+                        user: res,
+                    });
+    
+                }).catch ((error)=>{
+                    console.log(error);
+                    ctx.response.status = 405;
+                    ctx.body = {
+                        message: `No se pudo actualizar al Usuario`,
+                    };
+                });
+            } else {
+                ctx.response.status = 405;
+                ctx.body = {
+                    message: `Su código ha expirado, vuelva a solicitar otro`,
+                };
+            }
+
+
+
+
+        }).catch((error)=>{
+            ctx.response.status = 405;
+            ctx.body = {
+            message: `código incorrecto`
+            };
+        })
     } else {
         ctx.response.status = 401;
         ctx.body = {
-        message: `Se requiere un código y/o contraseña`
+        message: `Solicitud mal formulada`
         };
     }
 }
@@ -91,9 +199,9 @@ plugin.controllers.user.validateCode = async (ctx) => {
         }
       },
       {
-        method: "POST",
-        path: "/user/validateCode",
-        handler: "user.validateCode",
+        method: "PUT",
+        path: "/user/changePasswordByWhatsapp",
+        handler: "user.changePasswordByWhatsapp",
         config: {
           prefix: "",
           policies: []

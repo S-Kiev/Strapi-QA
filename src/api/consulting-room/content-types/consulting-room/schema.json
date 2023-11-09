@@ -4,7 +4,8 @@
   "info": {
     "singularName": "consulting-room",
     "pluralName": "consulting-rooms",
-    "displayName": "consultingRoom"
+    "displayName": "consultingRoom",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -20,17 +21,6 @@
     },
     "description": {
       "type": "text"
-    },
-    "availabilityStatus": {
-      "type": "enumeration",
-      "enum": [
-        "available",
-        "occupied",
-        "in use",
-        "out of service"
-      ],
-      "default": "available",
-      "required": false
     },
     "necessaryAction": {
       "type": "text"

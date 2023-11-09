@@ -4,7 +4,8 @@
   "info": {
     "singularName": "equipment",
     "pluralName": "equipments",
-    "displayName": "equipment"
+    "displayName": "equipment",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -29,17 +30,6 @@
     },
     "deactivationDate": {
       "type": "datetime"
-    },
-    "availabilityStatus": {
-      "type": "enumeration",
-      "enum": [
-        "available",
-        "rented",
-        "broken",
-        "out of use"
-      ],
-      "default": "available",
-      "required": true
     }
   }
 }

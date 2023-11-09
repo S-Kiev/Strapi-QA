@@ -1,0 +1,71 @@
+{
+  "kind": "collectionType",
+  "collectionName": "users_data",
+  "info": {
+    "singularName": "user-data",
+    "pluralName": "users-data",
+    "displayName": "userData",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "userId": {
+      "type": "uid"
+    },
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "lastname": {
+      "type": "string",
+      "required": true
+    },
+    "document": {
+      "type": "string",
+      "required": true
+    },
+    "cellphone": {
+      "type": "string",
+      "required": true
+    },
+    "adminUser": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "admin::user"
+    },
+    "city": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::city.city"
+    },
+    "address": {
+      "type": "string",
+      "required": true
+    },
+    "state": {
+      "type": "enumeration",
+      "enum": [
+        "enabled",
+        "locked",
+        "low"
+      ],
+      "required": true,
+      "default": "enabled"
+    },
+    "deactivationDate": {
+      "type": "datetime"
+    },
+    "activeHoursSince": {
+      "type": "datetime"
+    },
+    "activeHoursUntil": {
+      "type": "datetime"
+    },
+    "daysActiveHours": {
+      "type": "json"
+    }
+  }
+}

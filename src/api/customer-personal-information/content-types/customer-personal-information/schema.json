@@ -1,0 +1,64 @@
+{
+  "kind": "collectionType",
+  "collectionName": "customer_personal_informations",
+  "info": {
+    "singularName": "customer-personal-information",
+    "pluralName": "customer-personal-informations",
+    "displayName": "customerPersonalInformation",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "customerId": {
+      "type": "uid"
+    },
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "lastname": {
+      "type": "string",
+      "required": true
+    },
+    "document": {
+      "type": "string",
+      "required": true
+    },
+    "birthdate": {
+      "type": "datetime"
+    },
+    "cellphone": {
+      "type": "string",
+      "required": true
+    },
+    "email": {
+      "type": "email"
+    },
+    "city": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::city.city"
+    },
+    "address": {
+      "type": "string"
+    },
+    "howDidYouKnow": {
+      "type": "string"
+    },
+    "profession": {
+      "type": "string"
+    },
+    "reasonFirstVisit": {
+      "type": "string"
+    },
+    "medicalInformation": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::customer-medical-information.customer-medical-information",
+      "mappedBy": "customer"
+    }
+  }
+}

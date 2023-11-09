@@ -1,0 +1,35 @@
+{
+  "kind": "collectionType",
+  "collectionName": "equipments",
+  "info": {
+    "singularName": "equipment",
+    "pluralName": "equipments",
+    "displayName": "equipment",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "equipmentId": {
+      "type": "uid",
+      "required": false
+    },
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "brand": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text",
+      "required": false
+    },
+    "deactivationDate": {
+      "type": "datetime"
+    }
+  }
+}

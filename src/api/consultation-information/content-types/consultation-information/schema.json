@@ -1,0 +1,37 @@
+{
+  "kind": "collectionType",
+  "collectionName": "consultation_informations",
+  "info": {
+    "singularName": "consultation-information",
+    "pluralName": "consultation-informations",
+    "displayName": "consultationInformation",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "consultation": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::consultation.consultation"
+    },
+    "observationsConsultation": {
+      "type": "text"
+    },
+    "measures": {
+      "type": "boolean",
+      "default": false,
+      "required": true
+    },
+    "images": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    }
+  }
+}

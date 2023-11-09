@@ -4,7 +4,8 @@
   "info": {
     "singularName": "consultation",
     "pluralName": "consultations",
-    "displayName": "consultation"
+    "displayName": "consultation",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -13,6 +14,28 @@
   "attributes": {
     "consultationId": {
       "type": "uid"
+    },
+    "customer": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::customer-personal-information.customer-personal-information"
+    },
+    "treatments": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::treatment.treatment"
+    },
+    "extraConsultingRoom": {
+      "type": "boolean",
+      "default": false
+    },
+    "responsibleUser": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::user-data.user-data"
+    },
+    "comments": {
+      "type": "text"
     }
   }
 }

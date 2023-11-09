@@ -706,12 +706,30 @@ export interface ApiConsultationConsultation extends Schema.CollectionType {
     singularName: 'consultation';
     pluralName: 'consultations';
     displayName: 'consultation';
+    description: '';
   };
   options: {
     draftAndPublish: true;
   };
   attributes: {
     consultationId: Attribute.UID;
+    customer: Attribute.Relation<
+      'api::consultation.consultation',
+      'oneToOne',
+      'api::customer-personal-information.customer-personal-information'
+    >;
+    treatments: Attribute.Relation<
+      'api::consultation.consultation',
+      'oneToMany',
+      'api::treatment.treatment'
+    >;
+    extraConsultingRoom: Attribute.Boolean & Attribute.DefaultTo<false>;
+    responsibleUser: Attribute.Relation<
+      'api::consultation.consultation',
+      'oneToOne',
+      'api::user-data.user-data'
+    >;
+    comments: Attribute.Text;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -723,6 +741,89 @@ export interface ApiConsultationConsultation extends Schema.CollectionType {
       Attribute.Private;
     updatedBy: Attribute.Relation<
       'api::consultation.consultation',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiConsultationConsultingRoomConsultationConsultingRoom
+  extends Schema.CollectionType {
+  collectionName: 'consultation_consulting_rooms';
+  info: {
+    singularName: 'consultation-consulting-room';
+    pluralName: 'consultation-consulting-rooms';
+    displayName: 'consultation-consultingRoom ';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    consultation: Attribute.Relation<
+      'api::consultation-consulting-room.consultation-consulting-room',
+      'oneToOne',
+      'api::consultation.consultation'
+    >;
+    consultingRoom: Attribute.Relation<
+      'api::consultation-consulting-room.consultation-consulting-room',
+      'oneToOne',
+      'api::consulting-room.consulting-room'
+    >;
+    since: Attribute.DateTime;
+    until: Attribute.DateTime;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::consultation-consulting-room.consultation-consulting-room',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::consultation-consulting-room.consultation-consulting-room',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiConsultationInformationConsultationInformation
+  extends Schema.CollectionType {
+  collectionName: 'consultation_informations';
+  info: {
+    singularName: 'consultation-information';
+    pluralName: 'consultation-informations';
+    displayName: 'consultationInformation';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    consultation: Attribute.Relation<
+      'api::consultation-information.consultation-information',
+      'oneToOne',
+      'api::consultation.consultation'
+    >;
+    observationsConsultation: Attribute.Text;
+    measures: Attribute.Boolean &
+      Attribute.Required &
+      Attribute.DefaultTo<false>;
+    images: Attribute.Media;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::consultation-information.consultation-information',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::consultation-information.consultation-information',
       'oneToOne',
       'admin::user'
     > &
@@ -1027,6 +1128,51 @@ export interface ApiEquipmentHistoryEquipmentHistory
   };
 }
 
+export interface ApiMeasurementsCustomerMeasurementsCustomer
+  extends Schema.CollectionType {
+  collectionName: 'measurements_customers';
+  info: {
+    singularName: 'measurements-customer';
+    pluralName: 'measurements-customers';
+    displayName: 'measurementsCustomer';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    measurementsCustomerId: Attribute.UID;
+    consultation: Attribute.Relation<
+      'api::measurements-customer.measurements-customer',
+      'oneToOne',
+      'api::consultation.consultation'
+    >;
+    customer: Attribute.Relation<
+      'api::measurements-customer.measurements-customer',
+      'oneToOne',
+      'api::customer-personal-information.customer-personal-information'
+    >;
+    highWaist: Attribute.Float;
+    mean: Attribute.Float;
+    navelLine: Attribute.Float;
+    lowerBelly: Attribute.Float;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::measurements-customer.measurements-customer',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::measurements-customer.measurements-customer',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiTreatmentTreatment extends Schema.CollectionType {
   collectionName: 'treatments';
   info: {
@@ -1142,6 +1288,8 @@ declare module '@strapi/types' {
       'plugin::users-permissions.user': PluginUsersPermissionsUser;
       'api::city.city': ApiCityCity;
       'api::consultation.consultation': ApiConsultationConsultation;
+      'api::consultation-consulting-room.consultation-consulting-room': ApiConsultationConsultingRoomConsultationConsultingRoom;
+      'api::consultation-information.consultation-information': ApiConsultationInformationConsultationInformation;
       'api::consulting-room.consulting-room': ApiConsultingRoomConsultingRoom;
       'api::consulting-room-history.consulting-room-history': ApiConsultingRoomHistoryConsultingRoomHistory;
       'api::customer-medical-information.customer-medical-information': ApiCustomerMedicalInformationCustomerMedicalInformation;
@@ -1149,6 +1297,7 @@ declare module '@strapi/types' {
       'api::customer-personal-information.customer-personal-information': ApiCustomerPersonalInformationCustomerPersonalInformation;
       'api::equipment.equipment': ApiEquipmentEquipment;
       'api::equipment-history.equipment-history': ApiEquipmentHistoryEquipmentHistory;
+      'api::measurements-customer.measurements-customer': ApiMeasurementsCustomerMeasurementsCustomer;
       'api::treatment.treatment': ApiTreatmentTreatment;
       'api::user-data.user-data': ApiUserDataUserData;
     }

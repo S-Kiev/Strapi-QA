@@ -1,0 +1,39 @@
+{
+  "kind": "collectionType",
+  "collectionName": "treatments",
+  "info": {
+    "singularName": "treatment",
+    "pluralName": "treatments",
+    "displayName": "treatment",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "treatmentId": {
+      "type": "uid"
+    },
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "equipments": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::equipment.equipment"
+    },
+    "deactivationDate": {
+      "type": "datetime"
+    },
+    "consultingRooms": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::consulting-room.consulting-room"
+    }
+  }
+}

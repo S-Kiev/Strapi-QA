@@ -1,0 +1,38 @@
+{
+  "kind": "collectionType",
+  "collectionName": "consulting_room_histories",
+  "info": {
+    "singularName": "consulting-room-history",
+    "pluralName": "consulting-room-histories",
+    "displayName": "consultingRoomHistory"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "consultingRoomHistoryId": {
+      "type": "uid"
+    },
+    "consulting_room": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::consulting-room.consulting-room"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "available",
+        "occupied",
+        "out of service"
+      ],
+      "default": "available"
+    },
+    "since": {
+      "type": "datetime"
+    },
+    "until": {
+      "type": "datetime"
+    }
+  }
+}

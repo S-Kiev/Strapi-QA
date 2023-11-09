@@ -1,0 +1,75 @@
+{
+  "kind": "collectionType",
+  "collectionName": "customer_medical_informations",
+  "info": {
+    "singularName": "customer-medical-information",
+    "pluralName": "customer-medical-informations",
+    "displayName": "customerMedicalInformation"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "customerMedicalInformationId": {
+      "type": "uid"
+    },
+    "customer": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::customer-personal-information.customer-personal-information",
+      "inversedBy": "medicalInformation"
+    },
+    "informedConsent": {
+      "allowedTypes": [
+        "images",
+        "files"
+      ],
+      "type": "media",
+      "multiple": false
+    },
+    "medication": {
+      "type": "string"
+    },
+    "doctor": {
+      "type": "string"
+    },
+    "emergencyPhone": {
+      "type": "string",
+      "required": true
+    },
+    "suffersIllness": {
+      "type": "string"
+    },
+    "columnProblem": {
+      "type": "boolean"
+    },
+    "operation": {
+      "type": "string"
+    },
+    "heartProblem": {
+      "type": "boolean"
+    },
+    "cancer": {
+      "type": "string"
+    },
+    "diu": {
+      "type": "boolean"
+    },
+    "metalImplants": {
+      "type": "boolean"
+    },
+    "hypertensive": {
+      "type": "boolean"
+    },
+    "varicoseVeins": {
+      "type": "boolean"
+    },
+    "coagulationProblems": {
+      "type": "boolean"
+    },
+    "comments": {
+      "type": "text"
+    }
+  }
+}

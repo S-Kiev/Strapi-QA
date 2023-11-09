@@ -1,0 +1,31 @@
+{
+  "kind": "collectionType",
+  "collectionName": "consultation_consulting_rooms",
+  "info": {
+    "singularName": "consultation-consulting-room",
+    "pluralName": "consultation-consulting-rooms",
+    "displayName": "consultation-consultingRoom "
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "consultation": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::consultation.consultation"
+    },
+    "consultingRoom": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::consulting-room.consulting-room"
+    },
+    "since": {
+      "type": "datetime"
+    },
+    "until": {
+      "type": "datetime"
+    }
+  }
+}

@@ -7,7 +7,7 @@ const { generateCode } = require('./generateCode');
 module.exports = (plugin) => {
 
   plugin.controllers.user.sendCode = async (ctx) => {
-
+    console.log();
     //Podria buscar y validar el numero de telefono cuando tenga la tabla infoUsuario
     if ( !ctx.request.body.number ) {
 

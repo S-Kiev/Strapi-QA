@@ -5,7 +5,7 @@ const { sendCodeWhatsApp } = require('./sendCodeWhatsapp');
 module.exports = (plugin) => {
 
   plugin.controllers.user.sendCode = async (ctx) => {
-
+    console.log(ctx);
             if ( ctx.request.body.username || ctx.request.body.email ) {
                 const user = await strapi.query('plugin::users-permissions.user').findOne({
                     where: {

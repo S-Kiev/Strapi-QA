@@ -46,7 +46,16 @@ module.exports = {
                 })
             }));
 
-            
+            const name = customer[0].customer.name;
+            const lastname = customer[0].customer.lastname;
+            const cellphone = customer[0].customer.cellphone;
+
+            const message = `Hola ${name} ${lastname}, te recordamos que el dia de mañana a la hora ${hour} tienes consulta en nuestra clinica. Favor de confirmar`;
+
+            //Funcion de enviar WhatsAPP con el numero y mensaje
+
+            //console.log(customer[0].customer.cellphone);
+            console.log(message);
             /*
             customer.map(notify => {
                 const name = notify.customer.name;
@@ -59,21 +68,10 @@ module.exports = {
             });
             */
 
-            const name = customer[0].customer.name;
-            const lastname = customer[0].customer.lastname;
-            const cellphone = customer[0].customer.cellphone;
-
-            const message = `Hola ${name} ${lastname}, te recordamos que el dia de mañana a la hora ${hour} tienes consulta en nuestra clinica. Favor de confirmar`;
-
-            //Funcion de enviar WhatsAPP con el numero y mensaje
-
-            //console.log(customer[0].customer.cellphone);
-            //console.log(message);
-
-
         },
         options : {
-            rule : '*/10 * * * * *',
+            //'*/10 * * * * *' => 10s
+            rule : '*/10 * * * *',
             tz: 'America/Montreal'
         }
 
@@ -105,8 +103,6 @@ module.exports = {
                     consultation: true,
                 },
             });
-        
-           // console.log(consultingRoomsOccupiedfifteenMinutesBefore);
 
             const hour = consultingRoomsOccupiedfifteenMinutesBefore[0].since;
 
@@ -123,8 +119,10 @@ module.exports = {
                 })
             }));
 
-            console.log(collaborators[0].responsibleUser.cellphone);
-            console.log(collaborators[0].customer);
+            //console.log(collaborators[0].responsibleUser);
+            //console.log(collaborators[0].customer);
+
+            const collaboratorName = collaborators[0].responsibleUser.name;
 
             const customerName = collaborators[0].customer.name;
             const customerLastame = collaborators[0].customer.lastname;
@@ -132,7 +130,7 @@ module.exports = {
             const customerProfession = collaborators[0].customer.profession;
             const customerAddress = collaborators[0].customer.address;
 
-            const message = `Hola ${customerName}, te recuerdo que en 15 minutos aproximadamente, a la hora ${hour}, tienes consulta con ${customerName} ${customerLastame}; el ${customerProfession} de ${customerAddress}. Cualquier inconveniente avisale a ${customerCellphone}.`;
+            const message = `Hola ${collaboratorName}, te recuerdo que en 15 minutos aproximadamente, a la hora ${hour}, tienes consulta con ${customerName} ${customerLastame}; el ${customerProfession} de ${customerAddress}. Cualquier inconveniente avisale a ${customerCellphone}.`;
             
             console.log(message);
 
@@ -143,6 +141,9 @@ module.exports = {
             const customerCellphone = notify.customer.cellphone;
             const customerProfession = notify.customer.profession;
             const customerAddress = notify.customer.address;
+
+            const collaboratorName = notify.responsibleUser.name;
+            const collaboratorCellphone = notify.responsibleUser.cellphone;
     
                 const message = `Hola ${customerName}, te recuerdo que en 15 minutos aproximadamente, a la hora ${hour}, tienes consulta con ${customerName} ${customerLastame}; el ${customerProfession} de ${customerAddress}. Cualquier inconveniente avisale a ${customerCellphone}.`;
     
@@ -152,7 +153,8 @@ module.exports = {
 
         },
         options : {
-            rule : '*/10 * * * * *',
+            //'*/10 * * * * *' => 10s
+            rule : '*/10 * * * *',
             tz: 'America/Montreal'
         }
     }

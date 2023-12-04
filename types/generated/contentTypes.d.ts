@@ -755,6 +755,7 @@ export interface ApiConsultationConsultingRoomConsultationConsultingRoom
     singularName: 'consultation-consulting-room';
     pluralName: 'consultation-consulting-rooms';
     displayName: 'consultation-consultingRoom ';
+    description: '';
   };
   options: {
     draftAndPublish: true;
@@ -772,6 +773,8 @@ export interface ApiConsultationConsultingRoomConsultationConsultingRoom
     >;
     since: Attribute.DateTime;
     until: Attribute.DateTime;
+    notifyCustomer: Attribute.Boolean & Attribute.DefaultTo<false>;
+    notifyUser: Attribute.Boolean & Attribute.DefaultTo<false>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

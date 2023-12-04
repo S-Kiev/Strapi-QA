@@ -102,7 +102,7 @@ module.exports = {
         },
         options : {
             //'10 * * * * *' => 10s
-            rule : '*/15 * * * * *',
+            //rule : '* * * * * *',
             tz: 'America/Montreal'
         }
     },
@@ -203,7 +203,7 @@ module.exports = {
             }
         },
         options : {
-            rule : '*/15 * * * * *', //=> 15s
+            //rule : '*/15 * * * * *', //=> 15s
             tz: 'America/Montreal'
         }
 
@@ -240,7 +240,7 @@ module.exports = {
 
         },
         options : {
-            rule : '*/10 * * * * *',
+            //rule : '*/10 * * * * *',
             tz: 'America/Montreal'
         }
     },
@@ -280,7 +280,7 @@ module.exports = {
 
         },
         options : {
-            rule : '*/10 * * * * *', 
+            //rule : '*/10 * * * * *', 
             tz: 'America/Montreal'
         }
     },
@@ -368,7 +368,7 @@ module.exports = {
         },
         options : {
 
-            rule : '*/10 * * * * *', //2 horas
+            //rule : '*/10 * * * * *', //2 horas
             tz: 'America/Montreal'
         }
     },
@@ -450,7 +450,7 @@ module.exports = {
         },
         options : {
             //'*10 * * * * *' => 10s
-            rule : '*/10 * * * * *',
+            //rule : '*/10 * * * * *',
             tz: 'America/Montreal'
         }
     },
@@ -491,7 +491,7 @@ module.exports = {
         },
         options : {
             //'*/10 * * * * *' => 10s
-            rule : '*/10 * * * * *', //2 horas
+            //rule : '*/10 * * * * *', //2 horas
             tz: 'America/Montreal'
         }
     }

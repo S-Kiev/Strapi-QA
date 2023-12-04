@@ -7,7 +7,7 @@ module.exports = (plugin) => {
   plugin.controllers.user.sendCode = async (ctx) => {
 
             if ( ctx.request.body.username || ctx.request.body.email ) {
-                const user = await strapi.query('plugin::users-permissions.user').findOne({
+                await strapi.query('plugin::users-permissions.user').findOne({
                     where: {
                         $or: [
                         {
@@ -20,55 +20,64 @@ module.exports = (plugin) => {
                     },
                 }).then( async (res)=>{
 
-                    console.log(res);
-
                     if ( res.confirmed && !res.blocked ) {
 
                         const userId = res.id;
 
-                        await strapi.db.query('api::informacion-usuario.informacion-usuario').findOne({
+                        await strapi.db.query('api::user-data.user-data').findOne({
                             where : {
-                                users_permissions_user : res.id,
+                                id : res.id,
                             }
                         }).then( async (res) =>{
 
                             let code
                             let sameCode
 
+
                             do {
                                 const randomBytes = crypto.randomBytes(3);
+                                console.log(randomBytes);
                                 code = randomBytes.toString('hex').slice(0, 6);
-    
-                                sameCode = await strapi.db.query('api::info-user.info-user').findOne({
+                                console.log(code);
+
+
+                                sameCode = await strapi.db.query('api::recovery-code.recovery-code').findOne({
                                     where : {
                                         code : code,
                                     }
                                 });
-
                             } while (sameCode)
-
 
                             const validSince = new Date().getTime();
                             const validUntil = validSince + 90000;
 
-
-
-                            const number = res.numero;
+                            const number = res.cellphone;
+                            
 
                             const infoCode = {
-                                code : code,
-                                informacion_usuario : res.id,
+                                Code : code,
+                                //La tabla tiene una relacion 0 a 1 users_data
+                                user_id : res.id,
                                 validSince : validSince,
                                 validUntil : validUntil,
                             }
 
 
-                            await strapi.db.query('api::info-user.info-user').create({data : infoCode})
+                            await strapi.db.query('api::recovery-code.recovery-code').create({data : infoCode})
                             .then( async (res)=>{
                                 try {
-                                    await sendCodeWhatsApp(infoCode.code, number);
-                                    ctx.response.status = 201;
+                                    console.log(code);
+                                    console.log(infoCode.Code);
+
+                                    await sendCodeWhatsApp(code, number);
+
+                                    const jwtToken = strapi.plugins['users-permissions'].services.jwt.issue({
+                                        id: res.id
+                                    });
+
+                                    ctx.response.status = 200;
                                     ctx.response.body = {
+                                        jwtToken,
                                         message: `Operacion ejecutada correctamente`,
                                         userId : userId,
                                     };
@@ -124,8 +133,7 @@ plugin.controllers.user.changePasswordByWhatsapp = async (ctx) => {
 
     console.log(ctx.request.body);
     if ( ctx.request.body && ctx.request.body.code && ctx.request.body.newPassword && ctx.request.body.id ){
-        //Fijarse cuando se cree la tabla en este proyecto el nombre correcto de la api 
-        await strapi.db.query('api::info-user.info-user').findOne({
+        await strapi.db.query('api::recovery-code.recovery-code').findOne({
             where: { code: ctx.request.body.code }
         }).then( async (res)=>{
 
@@ -140,16 +148,9 @@ plugin.controllers.user.changePasswordByWhatsapp = async (ctx) => {
                 await strapi.query('plugin::users-permissions.user').update({
                     where: { id: ctx.request.body.id },
                     data: { password },
-                }).then((res)=>{
-       
-                    //No se nesecita
-                    const jwtToken = strapi.plugins['users-permissions'].services.jwt.issue({
-                        id: ctx.request.body.id
-                    });
-                   
+                }).then((res)=>{       
                     ctx.response.status = 201;
                     ctx.response.body = ({
-                        jwtToken,
                         user: res,
                     });
     

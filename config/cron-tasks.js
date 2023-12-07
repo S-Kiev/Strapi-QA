@@ -4,9 +4,7 @@ const { sendNotifyTemplateToCollaborator, sendNotifyTemplateToCustomer } = requi
 
 module.exports = {
 
-
     //NOTIFICACIONES
-
     notifyCollaborators: {
 
         task: async function ({ strapi }) {
@@ -55,40 +53,31 @@ module.exports = {
                         };
                     }));
 
-                await Promise.all(collaborators.map(async (notify) => {
+                if(collaborators.length > 0) {
+                    await Promise.all(collaborators.map(async (notify) => {
+                        const customerName = notify.customer.name;
+                        const customerLastname = notify.customer.lastname;
+                        const customerCellphone = notify.customer.cellphone;
+                        const customerProfession = notify.customer.profession;
+                        const customerAddress = notify.customer.address;
+    
+                        const collaboratorName = notify.collaborator.name;
+                        const collaboratorCellphone = notify.collaborator.cellphone;
+                        await sendNotifyTemplateToCollaborator(collaboratorCellphone, collaboratorName, customerName, customerLastname, customerProfession, customerAddress, customerCellphone);
+                    }));
 
-                    //USAR MENSAJE DE TEMPLATE??
-                    const customerName = notify.customer.name;
-                    const customerLastname = notify.customer.lastname;
-                    const customerCellphone = notify.customer.cellphone;
-                    const customerProfession = notify.customer.profession;
-                    const customerAddress = notify.customer.address;
+                    await Promise.all(consultingRoomsOccupiedfifteenMinutesBefore.map(async (consultingRooms) => {
+                        return strapi.db.query('api::consultation-consulting-room.consultation-consulting-room').update({
+                            where: {
+                                id: consultingRooms.id
+                            },
+                            data:
+                                { notifyUser: true }
+                        });
+                    }));
+                }
 
-                    const collaboratorName = notify.collaborator.name;
-                    const collaboratorCellphone = notify.collaborator.cellphone;
-
-                    //const message = `Hola ${collaboratorName}, te recuerdo que en 15 minutos aproximadamente, a la hora ${notify.hour}, tienes consulta con ${customerName} ${customerLastname}; el ${customerProfession} de ${customerAddress}. Cualquier inconveniente avisale a ${customerCellphone}.`;
-                    //console.log(message);
-                    //console.log(collaboratorCellphone);
-
-                    //await sendNotifyByWhatsapp(message, collaboratorCellphone);
-
-                    //PLAN B
-                    await sendNotifyTemplateToCollaborator(collaboratorCellphone, collaboratorName, customerName, customerLastname, customerProfession, customerAddress, customerCellphone);
-
-                }));
             }
-
-            await Promise.all(consultingRoomsOccupiedfifteenMinutesBefore.map(async (consultingRooms) => {
-                return strapi.db.query('api::consultation-consulting-room.consultation-consulting-room').update({
-                    where: {
-                        id: consultingRooms.id
-                    },
-                    data:
-                        { notifyUser: true }
-                });
-            }));
-
         },
         options: {
             //'10 * * * * *' => 10s
@@ -97,7 +86,6 @@ module.exports = {
         }
     },
     notifyCustomers: {
-        //Maldito TypeScript
 
         task: async function ({ strapi }) {
 
@@ -133,10 +121,6 @@ module.exports = {
 
                 const customer = await Promise.all(consultingRoomsOccupiedTomorrow
                     .map(async consultingRoom => {
-                        //console.log("Este es el id de la consulta =>" + consultingRoom.consultation.id);
-                        //console.log(consultingRoom.id);
-
-                        // Obtener información de la consulta, incluyendo la hora de inicio
                         const consultationInfo = await strapi.db.query('api::consultation.consultation').findOne({
                             where: {
                                 id: consultingRoom.consultation.id,
@@ -148,37 +132,28 @@ module.exports = {
 
                         return {
                             customer: consultationInfo.customer,
-                            hour: consultingRoom.since, // Incluir la hora de inicio en el resultado
+                            hour: consultingRoom.since, 
                         };
                     }));
 
+                if (customer.length > 0) {
+                    await Promise.all(customer.map(async (notify) => {
+                        const name = notify.customer.name;
+                        const lastname = notify.customer.lastname;
+                        const cellphone = notify.customer.cellphone;
+                        await sendNotifyTemplateToCustomer(cellphone, name, lastname, hour);
+                    }));
 
-                await Promise.all(customer.map(async (notify) => {
-
-
-                    const name = notify.customer.name;
-                    const lastname = notify.customer.lastname;
-                    const cellphone = notify.customer.cellphone;
-
-                    //const message = `Hola ${name} ${lastname}, te recordamos que el día de mañana a la hora ${hour} tienes consulta en nuestra clínica. Favor de confirmar`;
-                    //console.log(message);
-                    //console.log(cellphone);
-
-                    //await sendNotifyByWhatsapp(message, cellphone);
-
-                    //PLAN B
-                    await sendNotifyTemplateToCustomer(cellphone, name, lastname, hour);
-                }));
-
-                await Promise.all(consultingRoomsOccupiedTomorrow.map(async (consultingRooms) => {
-                    return strapi.db.query('api::consultation-consulting-room.consultation-consulting-room').update({
-                        where: {
-                            id: consultingRooms.id
-                        },
-                        data:
-                            { notifyCustomer: true }
-                    });
-                }));
+                    await Promise.all(consultingRoomsOccupiedTomorrow.map(async (consultingRooms) => {
+                        return strapi.db.query('api::consultation-consulting-room.consultation-consulting-room').update({
+                            where: {
+                                id: consultingRooms.id
+                            },
+                            data:
+                                { notifyCustomer: true }
+                        });
+                    }));
+                }
             }
         },
         options: {
@@ -188,70 +163,15 @@ module.exports = {
 
     },
 
+    //CONSULTATIONS
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    //consulting rooms
-
-    automaticallySwitchAvailableStatusConsultingRooms: {
-        task: async function ({ strapi }) {
-            const thisMoment = new Date();
-
-            const consutingRooms = await strapi.db.query('api::consultation-consulting-room.consultation-consulting-room').findMany({
-                where: {
-                    until: {
-                        $lte: thisMoment
-                    }
-                },
-                populate: {
-                    consultation: true,
-                },
-            });
-            //console.log("consutingRooms Que paso la hora =>");
-
-            //console.log(consutingRooms);
-
-
-            await Promise.all(consutingRooms.map(consutingRoom => {
-                return strapi.db.query('api::consulting-room-history.consulting-room-history').update({
-                    where: {
-                        consultingRoomHistoryId: consutingRoom.consultation.id,
-                        status: {
-                            $eqi: 'Occupied'
-                        },
-                    },
-                    data:
-                        { status: 'available' }
-                });
-            }));
-
-        },
-        options: {
-            rule: '*/30 * * * * *',
-            tz: 'America/Montreal'
-        }
-    },
-
-
-    automaticallySwitchOcuppiedStatusConsultingRooms: {
+    automaticallySwitchInProgressStatusConsultation: {
         task: async function ({ strapi }) {
 
             const thisMoment = new Date();
 
-            const consutingRooms = await strapi.db.query('api::consultation-consulting-room.consultation-consulting-room').findMany({
+            const historyConsultationConsultingRooms = await strapi.db.query('api::consultation-consulting-room.consultation-consulting-room').findMany({
                 where: {
                     since: {
                         $lte: thisMoment
@@ -261,28 +181,21 @@ module.exports = {
                     }
                 },
                 populate: {
-                    consultation: true,
-                },
+                    consultation: true
+                }
             });
 
-            //console.log("consutingRooms en horario de consulta =>");
+            //console.log("historyConsultationConsultingRooms en horario de consulta =>");
+            //console.log(historyConsultationConsultingRooms);
 
-            //console.log(consutingRooms);
-
-
-
-
-            if (consutingRooms.length > 0) {
-                await Promise.all(consutingRooms.map(consutingRoom => {
-                    return strapi.db.query('api::consulting-room-history.consulting-room-history').update({
+            if (historyConsultationConsultingRooms.length > 0){
+                await Promise.all(historyConsultationConsultingRooms.map(historyConsultationConsultingRoom => {
+                    return strapi.db.query('api::consultation.consultation').update({
                         where: {
-                            consultingRoomHistoryId: consutingRoom.consultation.id,
-                            status: {
-                                $eqi: 'available'
-                            },
+                            id: historyConsultationConsultingRoom.consultation.id,
                         },
                         data:
-                            { status: 'occupied' }
+                            { status: 'in progress' }
                     });
                 }));
             }
@@ -293,238 +206,202 @@ module.exports = {
         }
     },
 
+    automaticallySwitchFinishStatusConsultation: {
+        task: async function ({ strapi }) {
+            const thisMoment = new Date();
+
+            const historyConsultationConsultingRooms = await strapi.db.query('api::consultation-consulting-room.consultation-consulting-room').findMany({
+                where: {
+                    until: {
+                        $lte: thisMoment
+                    }
+                },
+                populate: {
+                    consultation: true
+                }
+            });
 
 
+            //console.log("historyConsultationRoomsHistory Que paso la hora =>");
+            //console.log(historyConsultationConsultingRooms);
 
-
-
-
-
-
-
-
-
-
+            
+            if (historyConsultationConsultingRooms.length > 0){
+                await Promise.all(historyConsultationConsultingRooms.map(historyConsultationConsultingRoom => {
+                    return strapi.db.query('api::consultation.consultation').update({
+                        where: {
+                            id: historyConsultationConsultingRoom.consultation.id,
+                        },
+                        data:
+                            { status: 'finish' }
+                    });
+                }));
+            };
+        },
+        options: {
+            rule: '*/30 * * * * *',
+            tz: 'America/Montreal'
+        }
+    },
 
     //EQUITMENTS
-    
-    //SI EL HISTORIAL DE EQUIPOS EN SINCE Y UNTIL COINCIDEN ENTONCES NO ES NESESARIO empezar por consultation-consulting-room => el history equitment
- 
-    automaticallySwitchOccupiedStatusEquitment : {
-        task: async function ({strapi}){
+
+    automaticallySwitchStatusEquitments: {
+        task: async function ({ strapi }) {
 
             const thisMoment = new Date();
 
-            const consultations = await strapi.db.query('api::consultation-consulting-room.consultation-consulting-room').findMany({
-                where : {
-                    since : {
+            const historyEquitments = await strapi.db.query('api::equipment-history.equipment-history').findMany({
+                where: {
+                    since: {
                         $lte: thisMoment
                     },
-                    until : {
-                        $gte: thisMoment  
+                    until: {
+                        $gte: thisMoment
                     }
                 },
                 populate: {
-                    consultation: true,
+                    equipment : true
                 }
             });
 
-            //console.log("consultations =>");
-            //console.log(consultations);
-            //console.log("------------------------------------");
+            console.log("historyEquitments en horario de consulta =>");
 
-            if(consultations.length > 0) {
+            console.log(historyEquitments);
 
-                const treatments = await Promise.all(consultations.map(consultation=>{
-                    return strapi.db.query('api::consultation.consultation').findMany({  
-                        where : {
-                            id : consultation.consultation.id,
-                        },
-                        populate: {
-                            treatments: true,
-                        }
-                    });
-                }));
     
-            //console.log("treatments =>");
-            //console.log(treatments[0][0].treatments);
-            //console.log("---------------------------------------------------");
-
-
-            if(treatments.length > 0) {
-
-                const equitments = await Promise.all(treatments[0][0].treatments.map(treatment=>{
-                    return strapi.db.query('api::treatment.treatment').findMany({  
-                        where : {
-                            id : treatment.treatmentId,
+            if (historyEquitments.length > 0){
+                await Promise.all(historyEquitments.map(historyEquitment => {
+                    return strapi.db.query('api::equipment.equipment').update({
+                        where: {
+                            id: historyEquitment.equipment.id,
                         },
-                        populate: {
-                            equipments: true,
-                        }
+                        data:
+                            { status: historyEquitment.status }
                     });
                 }));
-
-                //console.log("equitments =>");
-                //console.log(equitments[0][0].equipments);
-                //console.log("---------------------------------------------------");
-
-
-                if (equitments.length > 0) {
-                    await Promise.all(equitments[0][0].equipments.map(equipment=>{
-                        return strapi.db.query('api::equipment-history.equipment-history').update({  
-                            where : {
-                                //coinciden especificamente since y untile de equipment-history y consultation-consulting-room?
-                                id : equipment.equipmentId,
-                                since : {
-                                    $lte: thisMoment
-                                },
-                                until : {
-                                    $gte: thisMoment  
-                                },
-                                // si esta rentado o roto no estaria disponible para una consulta
-                                status: {
-                                    $eq : 'available'
-                                }
-                            },
-                            data : { status: 'occupied' }
-                        });
-                    }));                    
-                }
-            }
-        }
-
-            
+            };
         },
-        options : {
-
-            rule : '*/30 * * * * *', //2 horas
-            tz: 'America/Montreal'
-        }
-    },
-
-    automaticallySwitchAvailableStatusEquitment : {
-        task: async function ({strapi}){
-
-            const thisMoment = new Date();
-
-            const consultations = await strapi.db.query('api::consultation-consulting-room.consultation-consulting-room').findMany({
-                where : {
-                    until : {
-                        $lte: thisMoment  
-                    }
-                },
-                populate: {
-                    consultation: true,
-                }
-            });
-
-            //console.log("consultations =>");
-            //console.log(consultations);
-            //console.log("-------------------------------------------");
-
-
-            if(consultations.length > 0) {
-
-                const treatments = await Promise.all(consultations.map(consultation=>{
-                    return strapi.db.query('api::consultation.consultation').findMany({  
-                        where : {
-                            id : consultation.consultation.id,
-                        },
-                        populate: {
-                            treatments: true,
-                        }
-                    });
-                }));
-    
-            //console.log("---------------------------------------------------");
-            //console.log("treatments =>");
-            //console.log(treatments[0][0].treatments);
-
-            if(treatments.length > 0) {
-
-                const equitments = await Promise.all(treatments[0][0].treatments.map(treatment=>{
-                    return strapi.db.query('api::treatment.treatment').findMany({  
-                        where : {
-                            id : treatment.treatmentId,
-                        },
-                        populate: {
-                            equipments: true,
-                        }
-                    });
-                }));
-
-                //console.log("---------------------------------------------------");
-                //console.log("equitments =>");
-                //console.log(equitments[0][0].equipments);
-
-                if (equitments.length > 0) {
-                    await Promise.all(equitments[0][0].equipments.map(equipment=>{
-                        return strapi.db.query('api::equipment-history.equipment-history').update({  
-                            where : {
-                                id : equipment.equipmentId,
-                                until : {
-                                    $lte: thisMoment  
-                                },
-                                // si esta rentado o roto no estaria disponible para una consulta
-                                status: {
-                                    $eq : 'occupied'
-                                }
-                            },
-                            data : { status: 'available' }
-                        });
-                    }));                    
-                }
-            }
-        }
-
-            
-        },
-        options : {
-            rule : '*/10 * * * * *',
+        options: {
+            rule: '*/30 * * * * *',
             tz: 'America/Montreal'
         }
     },
 
     
-    automaticallySwitchAvilableStatusEquitmentIfIsRentedOrBroken : {
-        task: async function ({strapi}){
+    automaticallySwitchAvailableStatusEquitments: {
+        task: async function ({ strapi }) {
 
             const thisMoment = new Date();
 
-            const equitmentsToSwichState = await strapi.db.query('api::equipment-history.equipment-history').findMany({
+            const historyEquitments = await strapi.db.query('api::equipment-history.equipment-history').findMany({
                 where: {
-                    until: { $lte: thisMoment },
-                    $or: [
-                        { status: 'rented' },
-                        { status: 'broken' },
-                    ]
+                    until: {
+                        $lte: thisMoment
+                    }
                 },
+                populate: {
+                    equipment : true
+                }
             });
-            
+            //console.log("historyEquitments Que paso la hora =>");
 
-            console.log("equitmentsToSwichState =>");
-            console.log(equitmentsToSwichState);
+            //console.log(historyEquitments);
 
-            if(equitmentsToSwichState.length > 0) {
-
-                await Promise.all(equitmentsToSwichState.map(equipment=>{
-                    return strapi.db.query('api::equipment-history.equipment-history').update({  
-                        where : {
-                            id : equipment.equipmentHistoryId,
+            if (historyEquitments.length > 0){
+                await Promise.all(historyEquitments.map(historyEquitment => {
+                    return strapi.db.query('api::equipment.equipment').update({
+                        where: {
+                            id: historyEquitment.equipment.id,
                         },
-                        data : { status: 'available' }
+                        data:
+                            { status: 'available' }
                     });
                 }));
-        }
-
-            
+            }
         },
-        options : {
-            rule : '*/10 * * * * *', //2 horas
+        options: {
+            rule: '*/30 * * * * *',
             tz: 'America/Montreal'
         }
     },
 
-    //Hacer 2 cron task mas para que pase a rentado cuando empieza el equitment history y otro para broken
+    //CONSULTING ROOMS
 
+    automaticallySwitchStatusConsultingRooms: {
+        task: async function ({ strapi }) {
+
+            const thisMoment = new Date();
+
+            const historyConsutingRooms = await strapi.db.query('api::consulting-room-history.consulting-room-history').findMany({
+                where: {
+                    since: {
+                        $lte: thisMoment
+                    },
+                    until: {
+                        $gte: thisMoment
+                    }
+                },
+                populate: {
+                    consulting_room : true
+                }
+            });
+
+            //console.log("historyConsutingRooms en horario de consulta =>");
+
+            //console.log(historyConsutingRooms);
+
+            if (historyConsutingRooms.length > 0){
+                await Promise.all(historyConsutingRooms.map(historyConsutingRoom => {
+                    return strapi.db.query('api::consulting-room.consulting-room').update({
+                        where: {
+                            id: historyConsutingRoom.consulting_room.id,
+                        },
+                        data:
+                            { status: historyConsutingRoom.status }
+                    });
+                }));
+            }
+        },
+        options: {
+            rule: '*/30 * * * * *',
+            tz: 'America/Montreal'
+        }
+    },
+
+    automaticallySwitchAvailableStatusConsultingRooms: {
+        task: async function ({ strapi }) {
+            const thisMoment = new Date();
+
+            const historyConsutingRooms = await strapi.db.query('api::consulting-room-history.consulting-room-history').findMany({
+                where: {
+                    until: {
+                        $lte: thisMoment
+                    }
+                },
+                populate: {
+                    consulting_room : true
+                }
+            });
+            //console.log("consutingRooms Que paso la hora =>");
+
+            //console.log(historyConsutingRooms);
+
+            if (historyConsutingRooms.length > 0){
+                await Promise.all(historyConsutingRooms.map(historyConsutingRoom => {
+                    return strapi.db.query('api::consulting-room.consulting-room').update({
+                        where: {
+                            id: historyConsutingRoom.consulting_room.id,
+                        },
+                        data:
+                            { status: 'available' }
+                    });
+                }));
+            }
+        },
+        options: {
+            rule: '*/30 * * * * *',
+            tz: 'America/Montreal'
+        }
+    }
 }

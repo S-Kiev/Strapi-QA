@@ -5,9 +5,12 @@
 const { createCoreController } = require('@strapi/strapi').factories;
 
 
-module.exports = createCoreController('api::consultation.consultation'), ({strapi}) => ({
+module.exports = createCoreController('api::consultation.consultation');
 
-    async botCreate(ctx) {
+/*
+const customControllers = (plugin) => { 
+    
+plugin.controllers.consultation.botCreate = async (ctx) => {
         try {
             if (ctx.body && ctx.body.userNumber && ctx.body.customerName && ctx.body.customerLastname && ctx.body.dateSince && ctx.body.dateUntil && ctx.body.treatmentName && ctx.body.consultingRoomName){
                 const customer = await strapi.db.query('api::customer-personal-information.customer-personal-information').findOne({
@@ -130,22 +133,20 @@ module.exports = createCoreController('api::consultation.consultation'), ({strap
         } catch (error) {
             ctx.body = error;
         }
-    },
-    async botUpdate(ctx) {
-        try {
-            
-        } catch (error) {
-            ctx.body = error;
-        }
-    }
-});
 
-
-
-/*
-
-module.exports = (plugin) => { plugin.controllers.consultation.botCreate = async (ctx) => {
-    if (ctx.body && ctx.body.userNumber && ctx.body.customerName && ctx.body.customerLastname && ctx.body.dateSince && ctx.body.dateUntil && ctx.body.treatmentName && ctx.body.consultingRoomName){
 }
 
-*/
+plugin.controllers.consultation.botUpdate = async (ctx) => {
+    try {
+        
+    } catch (error) {
+        
+    }
+}
+}
+
+module.exports = {
+    ...coreController,
+    ...customControllers,
+  };
+  */

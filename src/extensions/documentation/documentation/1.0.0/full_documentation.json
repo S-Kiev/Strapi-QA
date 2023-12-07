@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2023-11-09T23:21:46.075Z"
+    "x-generation-date": "2023-12-06T22:29:09.021Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -541,6 +541,15 @@
               },
               "comments": {
                 "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "in progress",
+                  "finish",
+                  "cancel"
+                ]
               }
             }
           }
@@ -1568,6 +1577,16 @@
                                         "type": "string",
                                         "format": "date-time"
                                       },
+                                      "status": {
+                                        "type": "string",
+                                        "enum": [
+                                          "available",
+                                          "occupied",
+                                          "rented",
+                                          "broken",
+                                          "out of use"
+                                        ]
+                                      },
                                       "createdAt": {
                                         "type": "string",
                                         "format": "date-time"
@@ -1650,6 +1669,14 @@
                                       },
                                       "necessaryAction": {
                                         "type": "string"
+                                      },
+                                      "status": {
+                                        "type": "string",
+                                        "enum": [
+                                          "available",
+                                          "occupied",
+                                          "out of service"
+                                        ]
                                       },
                                       "createdAt": {
                                         "type": "string",
@@ -1899,6 +1926,15 @@
           },
           "comments": {
             "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "in progress",
+              "finish",
+              "cancel"
+            ]
           },
           "createdAt": {
             "type": "string",
@@ -3053,6 +3089,16 @@
                                                     "type": "string",
                                                     "format": "date-time"
                                                   },
+                                                  "status": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                      "available",
+                                                      "occupied",
+                                                      "rented",
+                                                      "broken",
+                                                      "out of use"
+                                                    ]
+                                                  },
                                                   "createdAt": {
                                                     "type": "string",
                                                     "format": "date-time"
@@ -3135,6 +3181,14 @@
                                                   },
                                                   "necessaryAction": {
                                                     "type": "string"
+                                                  },
+                                                  "status": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                      "available",
+                                                      "occupied",
+                                                      "out of service"
+                                                    ]
                                                   },
                                                   "createdAt": {
                                                     "type": "string",
@@ -3384,6 +3438,15 @@
                       },
                       "comments": {
                         "type": "string"
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "pending",
+                          "in progress",
+                          "finish",
+                          "cancel"
+                        ]
                       },
                       "createdAt": {
                         "type": "string",
@@ -4622,6 +4685,16 @@
                                                     "type": "string",
                                                     "format": "date-time"
                                                   },
+                                                  "status": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                      "available",
+                                                      "occupied",
+                                                      "rented",
+                                                      "broken",
+                                                      "out of use"
+                                                    ]
+                                                  },
                                                   "createdAt": {
                                                     "type": "string",
                                                     "format": "date-time"
@@ -4704,6 +4777,14 @@
                                                   },
                                                   "necessaryAction": {
                                                     "type": "string"
+                                                  },
+                                                  "status": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                      "available",
+                                                      "occupied",
+                                                      "out of service"
+                                                    ]
                                                   },
                                                   "createdAt": {
                                                     "type": "string",
@@ -4953,6 +5034,15 @@
                       },
                       "comments": {
                         "type": "string"
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "pending",
+                          "in progress",
+                          "finish",
+                          "cancel"
+                        ]
                       },
                       "createdAt": {
                         "type": "string",
@@ -5247,6 +5337,14 @@
               },
               "necessaryAction": {
                 "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "available",
+                  "occupied",
+                  "out of service"
+                ]
               }
             }
           }
@@ -5315,6 +5413,14 @@
           },
           "necessaryAction": {
             "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "available",
+              "occupied",
+              "out of service"
+            ]
           },
           "createdAt": {
             "type": "string",
@@ -5756,6 +5862,14 @@
                       },
                       "necessaryAction": {
                         "type": "string"
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "available",
+                          "occupied",
+                          "out of service"
+                        ]
                       },
                       "createdAt": {
                         "type": "string",
@@ -8550,6 +8664,16 @@
                                                     "type": "string",
                                                     "format": "date-time"
                                                   },
+                                                  "status": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                      "available",
+                                                      "occupied",
+                                                      "rented",
+                                                      "broken",
+                                                      "out of use"
+                                                    ]
+                                                  },
                                                   "createdAt": {
                                                     "type": "string",
                                                     "format": "date-time"
@@ -8632,6 +8756,14 @@
                                                   },
                                                   "necessaryAction": {
                                                     "type": "string"
+                                                  },
+                                                  "status": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                      "available",
+                                                      "occupied",
+                                                      "out of service"
+                                                    ]
                                                   },
                                                   "createdAt": {
                                                     "type": "string",
@@ -8881,6 +9013,15 @@
                       },
                       "comments": {
                         "type": "string"
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "pending",
+                          "in progress",
+                          "finish",
+                          "cancel"
+                        ]
                       },
                       "createdAt": {
                         "type": "string",
@@ -10235,6 +10376,16 @@
               "deactivationDate": {
                 "type": "string",
                 "format": "date-time"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "available",
+                  "occupied",
+                  "rented",
+                  "broken",
+                  "out of use"
+                ]
               }
             }
           }
@@ -10308,6 +10459,16 @@
           "deactivationDate": {
             "type": "string",
             "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "available",
+              "occupied",
+              "rented",
+              "broken",
+              "out of use"
+            ]
           },
           "createdAt": {
             "type": "string",
@@ -10755,6 +10916,16 @@
                       "deactivationDate": {
                         "type": "string",
                         "format": "date-time"
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "available",
+                          "occupied",
+                          "rented",
+                          "broken",
+                          "out of use"
+                        ]
                       },
                       "createdAt": {
                         "type": "string",
@@ -12239,6 +12410,16 @@
                                                     "type": "string",
                                                     "format": "date-time"
                                                   },
+                                                  "status": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                      "available",
+                                                      "occupied",
+                                                      "rented",
+                                                      "broken",
+                                                      "out of use"
+                                                    ]
+                                                  },
                                                   "createdAt": {
                                                     "type": "string",
                                                     "format": "date-time"
@@ -12321,6 +12502,14 @@
                                                   },
                                                   "necessaryAction": {
                                                     "type": "string"
+                                                  },
+                                                  "status": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                      "available",
+                                                      "occupied",
+                                                      "out of service"
+                                                    ]
                                                   },
                                                   "createdAt": {
                                                     "type": "string",
@@ -12570,6 +12759,15 @@
                       },
                       "comments": {
                         "type": "string"
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "pending",
+                          "in progress",
+                          "finish",
+                          "cancel"
+                        ]
                       },
                       "createdAt": {
                         "type": "string",
@@ -13487,6 +13685,16 @@
                           "type": "string",
                           "format": "date-time"
                         },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "available",
+                            "occupied",
+                            "rented",
+                            "broken",
+                            "out of use"
+                          ]
+                        },
                         "createdAt": {
                           "type": "string",
                           "format": "date-time"
@@ -13821,6 +14029,14 @@
                         },
                         "necessaryAction": {
                           "type": "string"
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "available",
+                            "occupied",
+                            "out of service"
+                          ]
                         },
                         "createdAt": {
                           "type": "string",

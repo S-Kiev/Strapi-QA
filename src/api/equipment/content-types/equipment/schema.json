@@ -30,6 +30,17 @@
     },
     "deactivationDate": {
       "type": "datetime"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "available",
+        "occupied",
+        "rented",
+        "broken",
+        "out of use"
+      ],
+      "default": "available"
     }
   }
 }

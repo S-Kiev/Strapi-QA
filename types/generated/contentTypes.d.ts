@@ -730,6 +730,10 @@ export interface ApiConsultationConsultation extends Schema.CollectionType {
       'api::user-data.user-data'
     >;
     comments: Attribute.Text;
+    status: Attribute.Enumeration<
+      ['pending', 'in progress', 'finish', 'cancel']
+    > &
+      Attribute.DefaultTo<'pending'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -850,6 +854,8 @@ export interface ApiConsultingRoomConsultingRoom extends Schema.CollectionType {
     name: Attribute.String & Attribute.Required;
     description: Attribute.Text;
     necessaryAction: Attribute.Text;
+    status: Attribute.Enumeration<['available', 'occupied', 'out of service']> &
+      Attribute.DefaultTo<'available'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1072,6 +1078,10 @@ export interface ApiEquipmentEquipment extends Schema.CollectionType {
     brand: Attribute.String & Attribute.Required;
     description: Attribute.Text;
     deactivationDate: Attribute.DateTime;
+    status: Attribute.Enumeration<
+      ['available', 'occupied', 'rented', 'broken', 'out of use']
+    > &
+      Attribute.DefaultTo<'available'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

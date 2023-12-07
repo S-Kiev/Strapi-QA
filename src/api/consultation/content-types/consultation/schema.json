@@ -36,6 +36,16 @@
     },
     "comments": {
       "type": "text"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "pending",
+        "in progress",
+        "finish",
+        "cancel"
+      ],
+      "default": "pending"
     }
   }
 }

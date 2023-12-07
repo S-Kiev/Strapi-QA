@@ -1,7 +1,19 @@
 const axios = require('axios');
 
 async function sendNotifyTemplateToCollaborator( cellphone, name, nameCustumer, lastnameCustomer, professionCustomer, addressCustomer, phoneCustomer) {
-    let data = JSON.stringify({
+ 
+  
+  //SI FALTA ALGUNO DE ESTOS DATOS NO SE PUEDE ENVIAR
+  console.log("cellphone =>" + cellphone);
+  console.log("name =>" + name);
+  console.log("nameCustumer =>" + nameCustumer);
+  console.log("lastnameCustomer =>" + lastnameCustomer);
+  console.log("professionCustomer =>" + professionCustomer);
+  console.log("addressCustomer =>" + addressCustomer);
+  console.log("phoneCustomer =>" + phoneCustomer);
+
+
+  let data = JSON.stringify({
         "messaging_product": "whatsapp",
         "recipient_type": "individual",
         "to": cellphone,

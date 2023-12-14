@@ -308,7 +308,7 @@ module.exports = {
 
             //console.log(historyEquitments);
 
-            if (historyEquitments.length > 0){
+            if (historyEquitments.length > 0) {
                 await Promise.all(historyEquitments.map(historyEquitment => {
                     return strapi.db.query('api::equipment.equipment').update({
                         where: {

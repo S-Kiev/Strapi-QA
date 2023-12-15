@@ -551,7 +551,6 @@ plugin.controllers.user.botCreate = async (ctx) => {
                             message : "No se pudo identificar al responsable para esta consulta"
                         }
                     }
-                    
                 }
                 
                 else {

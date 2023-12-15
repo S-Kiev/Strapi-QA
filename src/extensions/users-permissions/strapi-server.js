@@ -212,8 +212,8 @@ plugin.controllers.user.botCreate = async (ctx) => {
 
                 const customer = await strapi.db.query('api::customer-personal-information.customer-personal-information').findOne({
                     where: { 
-                        name: ctx.request.body.customerName,
-                        lastname: ctx.request.body.customerLastname
+                        name: {$eqi: ctx.request.body.customerName},
+                        lastname: {$eqi: ctx.request.body.customerLastname}
                     }
                 });
                 console.log("----------------------------------------------");
@@ -243,7 +243,7 @@ plugin.controllers.user.botCreate = async (ctx) => {
                             console.log(treatmentName);
                             const treatment = await strapi.db.query('api::treatment.treatment').findOne({
                                 where: { 
-                                    name: treatmentName,
+                                    name: {$eqi: treatmentName},
                                 },
                                 populate: {
                                     equipments: true,
@@ -269,7 +269,7 @@ plugin.controllers.user.botCreate = async (ctx) => {
 
                             const consultingRoom = await strapi.db.query('api::consulting-room.consulting-room').findOne({
                                 where: { 
-                                    name: ctx.request.body.consultingRoomName,
+                                    name: {$eqi: ctx.request.body.consultingRoomName},
                                 }
                             });
 

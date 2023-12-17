@@ -283,7 +283,7 @@ module.exports = {
             };
         },
         options: {
-            rule: '* */30 * * * *',
+            rule: '* */30 */1 * * *',
             tz: 'America/Montreal'
         }
     },

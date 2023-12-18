@@ -744,6 +744,7 @@ plugin.controllers.user.simlpleCreateConsultation = async (ctx) => {
 
 plugin.controllers.user.cancelConsultation = async (ctx) => {
     try {
+        console.log("ctx.request.body => ");
         console.log(ctx.request.body);
         if ( 
             ctx.request.body &&
@@ -755,7 +756,9 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
         ) { 
             const dateSince = new Date(ctx.request.body.dateSince);
             const dateUntil = new Date(ctx.request.body.dateUntil);
+            console.log("dateSince => ");
             console.log(dateSince);
+            console.log("dateUntil => ");
             console.log(dateUntil);
             
 
@@ -789,6 +792,7 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
                         const consultationConsultingRoomsThisDay2 = await strapi.db.query('api::consultation-consulting-room.consultation-consulting-room').findMany({ 
                             populate : true
                         });
+                        console.log("consultationConsultingRoomsThisDay => ");
                         console.log(consultationConsultingRoomsThisDay2);
 
                         //ME TRAERA LOS REGISTROS DE ESE DIA 
@@ -815,23 +819,25 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
                                     }, 
                                     populate : true
                                 });
-
+                                console.log("consultation => ");
                                 console.log(consultation);
                                 const customerInArray = consultation.customer;
+                                console.log("customerInArray => ");
                                 console.log(customerInArray);
                                 const responsibleUserInArray = consultation.responsibleUser;
+                                console.log("responsibleUserInArray => ");
                                 console.log(responsibleUserInArray);
 
 
 
                                 //ME TRAERA LA CONSULTA DE ESE CLIENTE (SUPONIENDO QUE ES UNA)
                                 //SI ES MAS DE 1 PODRIA USAR LA HORA?
-                                console.log(customerInArray.id);
-                                console.log(customer.id);
-                                console.log(customerInArray.id === customer.id);
-                                console.log(responsibleUserInArray.id);
-                                console.log(responsibleUser.id);
-                                console.log(responsibleUserInArray.id === responsibleUser.id);
+                                console.log("customerInArray.id => " + customerInArray.id);
+                                console.log("customer.id => " + customer.id);
+                                console.log("customerInArray.id === customer.id => " + customerInArray.id === customer.id);
+                                console.log("responsibleUserInArray.id => " + responsibleUserInArray.id);
+                                console.log("responsibleUser.id => " + responsibleUser.id);
+                                console.log("responsibleUserInArray.id === responsibleUser.id => " + responsibleUserInArray.id === responsibleUser.id);
 
 
                                 if(customerInArray.id === customer.id && responsibleUserInArray.id === responsibleUser.id) {
@@ -839,9 +845,15 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
                                 }
                             }));
 
+                            console.log("consultationConsultingRooms => ");
                             console.log(consultationConsultingRooms);
+
+                            console.log("consultationConsultingRooms.length === 1 => ");
                             console.log(consultationConsultingRooms.length === 1);
+
+                            console.log("!consultationConsultingRooms.includes(null) => ");
                             console.log(!consultationConsultingRooms.includes(null));
+
 
                             //=>MAP REGRESA UN ARRAY PERO DEBERIA SER UN ARRAY CON UN ELEMENTO, EL QUE ESTOY BUSCANDO
                             if(consultationConsultingRooms.length === 1 && !consultationConsultingRooms.includes(null)){
@@ -849,9 +861,15 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
 
                                     console.log ("Llegamos a las modificaciones")
                                     const consultationConsultingRoomsUpadte = await Promise.all(consultationConsultingRooms.map(async consultationConsultingRoom=>{
+                                        console.log("consultationConsultingRoom.consultingRoom.id => ");
                                         console.log(consultationConsultingRoom.consultingRoom.id);
+
+                                        console.log("consultationConsultingRoom.since => ");
                                         console.log(consultationConsultingRoom.since);
+
+                                        console.log("consultationConsultingRoom.until => ");
                                         console.log(consultationConsultingRoom.until);
+
 
                                         const seeHistory = await strapi.db.query('api::consulting-room-history.consulting-room-history').findOne({  
                                             where: {
@@ -861,7 +879,7 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
                                             }
                                         });
 
-                                        console.log(seeHistory);
+                                        console.log("seeHistory => " + seeHistory);
 
                                          return await strapi.db.query('api::consulting-room-history.consulting-room-history').update({  
                                             where: {
@@ -874,7 +892,7 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
                                         });
                                     }));
 
-                                    console.log(consultationConsultingRoomsUpadte);
+                                    console.log("consultationConsultingRoomsUpadte => " + consultationConsultingRoomsUpadte);
 
                                     const equipmentHistoryPromises = [];
 
@@ -889,7 +907,7 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
                                         });
                                     }));
 
-                                    console.log(consultations);
+                                    console.log("consultations => " + consultations);
 
                                     consultations.forEach(async consultation => {
                                         
@@ -904,7 +922,7 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
                                             });
                                         }));
 
-                                        console.log (allTreatments);
+                                        console.log ("allTreatments => " + allTreatments);
 
                                         if (allTreatments[0].length > 0) {
                                                 // Iterar sobre cada conjunto de tratamientos
@@ -923,11 +941,11 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
                                                                         }
                                                                     });
 
-                                                                    console.log(seeEquipmentHistory);
+                                                                    console.log("seeEquipmentHistory => " + seeEquipmentHistory);
 
-                                                                    console.log(equipment.id);
-                                                                    console.log(consultationConsultingRooms[0].since);
-                                                                    console.log(consultationConsultingRooms[0].until);
+                                                                    console.log("equipment.id => " + equipment.id);
+                                                                    console.log("consultationConsultingRooms[0].since => " + consultationConsultingRooms[0].since);
+                                                                    console.log("consultationConsultingRooms[0].until => " + consultationConsultingRooms[0].until);
 
                                                                     const equipmentHistoryPromise = await strapi.db.query('api::equipment-history.equipment-history').update({
                                                                         where: {
@@ -951,7 +969,7 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
                                     // Aqui todas las promesas de bambio de estado de los historiales de equipo se concretan
                                     const equipmentHistoryUpadte = await Promise.all(equipmentHistoryPromises);
 
-                                    console.log(equipmentHistoryUpadte);
+                                    console.log("equipmentHistoryUpadte => " + equipmentHistoryUpadte);
 
                                     const cancelConsultation = await Promise.all(consultationConsultingRooms.map(async consultationConsultingRoom => {
                                         return await strapi.db.query('api::consultation.consultation').update({  
@@ -963,7 +981,7 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
                                         });
                                     }));
 
-                                    console.log(cancelConsultation)
+                                    console.log("cancelConsultation => " + cancelConsultation)
 
                                     if (cancelConsultation){
                                         ctx.response.status = 200;

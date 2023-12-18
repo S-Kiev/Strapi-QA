@@ -832,12 +832,17 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
 
                                 //ME TRAERA LA CONSULTA DE ESE CLIENTE (SUPONIENDO QUE ES UNA)
                                 //SI ES MAS DE 1 PODRIA USAR LA HORA?
-                                //console.log("customerInArray.id => " + customerInArray.id);
-                                //console.log("customer.id => " + customer.id);
+                                console.log("----------------------------------------------------------");
+
+                                console.log("customerInArray.id => " + customerInArray.id);
+                                console.log("customer.id => " + customer.id);
                                 console.log("customerInArray.id === customer.id => " + customerInArray.id === customer.id);
-                                //console.log("responsibleUserInArray.id => " + responsibleUserInArray.id);
-                                //console.log("responsibleUser.id => " + responsibleUser.id);
+                                console.log("----------------------------------------------------------");
+
+                                console.log("responsibleUserInArray.id => " + responsibleUserInArray.id);
+                                console.log("responsibleUser.id => " + responsibleUser.id);
                                 console.log("responsibleUserInArray.id === responsibleUser.id => " + responsibleUserInArray.id === responsibleUser.id);
+                                console.log("----------------------------------------------------------");
 
 
                                 if(customerInArray.id === customer.id && responsibleUserInArray.id === responsibleUser.id) {
@@ -851,12 +856,12 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
                             console.log("consultationConsultingRooms.length === 1 => ");
                             console.log(consultationConsultingRooms.length === 1);
 
-                            console.log("!consultationConsultingRooms.includes(null) => ");
-                            console.log(!consultationConsultingRooms.includes(null));
+                            console.log("(!consultationConsultingRooms.includes(null) || !consultationConsultingRooms.includes(undefined)) => ");
+                            console.log((!consultationConsultingRooms.includes(null) || !consultationConsultingRooms.includes(undefined)));
 
 
                             //=>MAP REGRESA UN ARRAY PERO DEBERIA SER UN ARRAY CON UN ELEMENTO, EL QUE ESTOY BUSCANDO
-                            if(consultationConsultingRooms.length === 1 && !consultationConsultingRooms.includes(null)){
+                            if(consultationConsultingRooms.length === 1 && (!consultationConsultingRooms.includes(null) || !consultationConsultingRooms.includes(undefined))){
                                 try {
 
                                     console.log ("Llegamos a las modificaciones")

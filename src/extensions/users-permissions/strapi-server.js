@@ -832,11 +832,11 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
 
                                 //ME TRAERA LA CONSULTA DE ESE CLIENTE (SUPONIENDO QUE ES UNA)
                                 //SI ES MAS DE 1 PODRIA USAR LA HORA?
-                                console.log("customerInArray.id => " + customerInArray.id);
-                                console.log("customer.id => " + customer.id);
+                                //console.log("customerInArray.id => " + customerInArray.id);
+                                //console.log("customer.id => " + customer.id);
                                 console.log("customerInArray.id === customer.id => " + customerInArray.id === customer.id);
-                                console.log("responsibleUserInArray.id => " + responsibleUserInArray.id);
-                                console.log("responsibleUser.id => " + responsibleUser.id);
+                                //console.log("responsibleUserInArray.id => " + responsibleUserInArray.id);
+                                //console.log("responsibleUser.id => " + responsibleUser.id);
                                 console.log("responsibleUserInArray.id === responsibleUser.id => " + responsibleUserInArray.id === responsibleUser.id);
 
 

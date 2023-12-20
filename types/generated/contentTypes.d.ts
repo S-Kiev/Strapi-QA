@@ -730,6 +730,10 @@ export interface ApiConsultationConsultation extends Schema.CollectionType {
       'api::user-data.user-data'
     >;
     comments: Attribute.Text;
+    status: Attribute.Enumeration<
+      ['pending', 'in progress', 'finish', 'cancel']
+    > &
+      Attribute.DefaultTo<'pending'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -755,6 +759,7 @@ export interface ApiConsultationConsultingRoomConsultationConsultingRoom
     singularName: 'consultation-consulting-room';
     pluralName: 'consultation-consulting-rooms';
     displayName: 'consultation-consultingRoom ';
+    description: '';
   };
   options: {
     draftAndPublish: true;
@@ -772,6 +777,8 @@ export interface ApiConsultationConsultingRoomConsultationConsultingRoom
     >;
     since: Attribute.DateTime;
     until: Attribute.DateTime;
+    notifyCustomer: Attribute.Boolean & Attribute.DefaultTo<false>;
+    notifyUser: Attribute.Boolean & Attribute.DefaultTo<false>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -847,6 +854,8 @@ export interface ApiConsultingRoomConsultingRoom extends Schema.CollectionType {
     name: Attribute.String & Attribute.Required;
     description: Attribute.Text;
     necessaryAction: Attribute.Text;
+    status: Attribute.Enumeration<['available', 'occupied', 'out of service']> &
+      Attribute.DefaultTo<'available'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1069,6 +1078,10 @@ export interface ApiEquipmentEquipment extends Schema.CollectionType {
     brand: Attribute.String & Attribute.Required;
     description: Attribute.Text;
     deactivationDate: Attribute.DateTime;
+    status: Attribute.Enumeration<
+      ['available', 'occupied', 'rented', 'broken', 'out of use']
+    > &
+      Attribute.DefaultTo<'available'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1166,6 +1179,49 @@ export interface ApiMeasurementsCustomerMeasurementsCustomer
       Attribute.Private;
     updatedBy: Attribute.Relation<
       'api::measurements-customer.measurements-customer',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiRecoveryCodeRecoveryCode extends Schema.CollectionType {
+  collectionName: 'recovery_codes';
+  info: {
+    singularName: 'recovery-code';
+    pluralName: 'recovery-codes';
+    displayName: 'Recovery Code';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    Code: Attribute.String &
+      Attribute.Required &
+      Attribute.SetMinMaxLength<{
+        minLength: 5;
+        maxLength: 7;
+      }>;
+    validSince: Attribute.DateTime;
+    validUntil: Attribute.DateTime;
+    user_datum: Attribute.Relation<
+      'api::recovery-code.recovery-code',
+      'oneToOne',
+      'api::user-data.user-data'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::recovery-code.recovery-code',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::recovery-code.recovery-code',
       'oneToOne',
       'admin::user'
     > &
@@ -1298,6 +1354,7 @@ declare module '@strapi/types' {
       'api::equipment.equipment': ApiEquipmentEquipment;
       'api::equipment-history.equipment-history': ApiEquipmentHistoryEquipmentHistory;
       'api::measurements-customer.measurements-customer': ApiMeasurementsCustomerMeasurementsCustomer;
+      'api::recovery-code.recovery-code': ApiRecoveryCodeRecoveryCode;
       'api::treatment.treatment': ApiTreatmentTreatment;
       'api::user-data.user-data': ApiUserDataUserData;
     }

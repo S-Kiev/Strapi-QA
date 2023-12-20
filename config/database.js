@@ -14,6 +14,7 @@ module.exports = ({ env }) => {
         database,
         user,
         password,
+        timezone: 'America/Montevideo',
         ssl: { rejectUnauthorized: false },
       },
       debug: false,

@@ -24,6 +24,15 @@
     },
     "necessaryAction": {
       "type": "text"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "available",
+        "occupied",
+        "out of service"
+      ],
+      "default": "available"
     }
   }
 }

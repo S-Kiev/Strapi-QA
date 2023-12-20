@@ -1,0 +1,7 @@
+  develop                                     [m 3e97621 [ahead 4] prueba
+  feature/B-002-Restablecer-contaseña-Whatsapp[m 503cf4b Merge branch 'develop' of https://bitbucket.org/eugenia_finozzi/backend-agc/src/master into feature/B-002-Restablecer-contaseña-Whatsapp
+  feature/B-002-Restablecer-contrasena-Backend[m ca99aa5 [ahead 7] cambios
+* [32mfeature/C-001-Tareas-Programadas            [m e895eae [ahead 6] subiendo cambios
+  feature/QA                                  [m 503cf4b Merge branch 'develop' of https://bitbucket.org/eugenia_finozzi/backend-agc/src/master into feature/B-002-Restablecer-contaseña-Whatsapp
+  main                                        [m 0f32bf6 [behind 16] Agregando endpoints personalizados para cambiar contraseña por whatsapp
+  master                                      [m 137185a primer commit

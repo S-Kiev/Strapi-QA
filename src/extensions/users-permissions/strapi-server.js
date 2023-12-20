@@ -380,7 +380,8 @@ plugin.controllers.user.botCreate = async (ctx) => {
                                                       extraConsultingRoom: false,
                                                       responsibleUser: responsibleUser.id,
                                                       comments: "",
-                                                      status: 'pending'
+                                                      status: 'pending',
+                                                      publishedAt: new Date()
                                                     },
                                                   });
 
@@ -393,7 +394,8 @@ plugin.controllers.user.botCreate = async (ctx) => {
                                                             since: dateSince,
                                                             until: dateUntil,
                                                             notifyCustomer: false,
-                                                            notifyUser: false
+                                                            notifyUser: false,
+                                                            publishedAt: new Date()
                                                             },
                                                         });
                                                         console.log(consultationConsultingRoom);
@@ -406,6 +408,7 @@ plugin.controllers.user.botCreate = async (ctx) => {
                                                                 status:  'occupied',
                                                                 since: dateSince,
                                                                 until: dateUntil,
+                                                                publishedAt: new Date()
                                                                 },
                                                             });
 
@@ -427,6 +430,7 @@ plugin.controllers.user.botCreate = async (ctx) => {
                                                                             status: 'occupied',
                                                                             since: dateSince,
                                                                             until: dateUntil,
+                                                                            publishedAt: new Date()
                                                                         },
                                                                         });
                                                                 
@@ -446,6 +450,7 @@ plugin.controllers.user.botCreate = async (ctx) => {
                                                                         newConsultation: newConsultation
                                                                     }
                                                                 } else {
+                                                                    //borrar datos si no sale bien
                                                                 // enviar respuesta negativa
                                                                     ctx.response.status = 500;
                                                                     ctx.response.body = {
@@ -582,7 +587,6 @@ plugin.controllers.user.botCreate = async (ctx) => {
     }
 }
 
-
 plugin.controllers.user.simlpleCreateConsultation = async (ctx) => {
     try {
         if ( ctx.request.body &&
@@ -637,7 +641,7 @@ plugin.controllers.user.simlpleCreateConsultation = async (ctx) => {
                     const newConsultation = await strapi.db.query('api::consultation.consultation').create({
                         data: {
                           customer: ctx.request.body.customerId,
-                          treatments: ctx.request.body.treatments.map(treatment => treatment.id),
+                          treatments: ctx.request.body.treatments.map(treatment => treatment),
                           extraConsultingRoom:  ctx.request.body.extraConsultingRoomId ? ctx.request.body.extraConsultingRoomId : null,
                           responsibleUser: ctx.request.body.responsibleUserId,
                           comments: ctx.request.body.comments ? ctx.request.body.comments : null,
@@ -994,7 +998,7 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
                                             message : `Se cancelo exitosamente la consulta`,
                                             cancelConsultation : cancelConsultation
                                         }
-                                    }
+                                    } 
                                     
                                 } catch (error) {
                                     ctx.response.status = 405;
@@ -1006,7 +1010,7 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
                             } else {
                                 ctx.response.status = 405;
                                 ctx.response.body = {
-                                    message : `No tienes una cita con ${customer.name} ${customer.lastname}`
+                                    message : `Este cliente tiene más de una consulta ese dia y no puedo saber cual, te recomiendo ir a la aplicación para cancelarla`
                                 }
                             }
                         } else {

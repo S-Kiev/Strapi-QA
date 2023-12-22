@@ -60,6 +60,7 @@ module.exports = (plugin) => {
                                 user_id : res.id,
                                 validSince : validSince,
                                 validUntil : validUntil,
+                                publishedAt: new Date()
                             }
 
 
@@ -126,7 +127,6 @@ module.exports = (plugin) => {
         };
     }
 }
-
 
 
 plugin.controllers.user.changePasswordByWhatsapp = async (ctx) => {
@@ -443,18 +443,36 @@ plugin.controllers.user.botCreate = async (ctx) => {
                                                                 // Espera a que se completen todas las promesas antes de continuar
                                                                 const equipmentHistories = await Promise.all(equipmentHistoryPromises);
         
-                                                                if(equipmentHistories && equipmentHistories.length > 0) {
+                                                                if(equipmentHistories && equipmentHistories.length > 0 && consultingRoomHistory && consultationConsultingRoom && newConsultation) {
                                                                     ctx.response.status = 200;
                                                                     ctx.response.body = {
                                                                         message : "Consulta creada con exito",
                                                                         newConsultation: newConsultation
                                                                     }
                                                                 } else {
+                                                                    equipmentHistories.forEach( async equitment => {
+                                                                        await strapi.db.query('api::equipment-history.equipment-history').delete({
+                                                                            where: { id: equitment.id },
+                                                                        });
+                                                                    });
+
+                                                                    await strapi.db.query('api::consulting-room-history.consulting-room-history').delete({
+                                                                        where: { id: consultingRoomHistory.id },
+                                                                    });
+
+                                                                    await strapi.db.query('api::consultation-consulting-room.consultation-consulting-room').delete({
+                                                                        where: { id: consultationConsultingRoom.id },
+                                                                    });
+                                                                    
+                                                                    await strapi.db.query('api::consultation.consultation').delete({
+                                                                        where: { id: newConsultation.id },
+                                                                    });
+
                                                                     //borrar datos si no sale bien
                                                                 // enviar respuesta negativa
                                                                     ctx.response.status = 500;
                                                                     ctx.response.body = {
-                                                                        message : "No se pudo registrar en el history-equitment",
+                                                                        message : "No se pudo registrar en la consulta, intentalo de nuevo",
                                                                     }
                                                                 }
                                                             } else {                                                                             //borrar consulta
@@ -645,7 +663,8 @@ plugin.controllers.user.simlpleCreateConsultation = async (ctx) => {
                           extraConsultingRoom:  ctx.request.body.extraConsultingRoomId ? ctx.request.body.extraConsultingRoomId : null,
                           responsibleUser: ctx.request.body.responsibleUserId,
                           comments: ctx.request.body.comments ? ctx.request.body.comments : null,
-                          status: 'pending'
+                          status: 'pending',
+                          publishedAt: new Date()
                         },
                       });
     
@@ -656,7 +675,8 @@ plugin.controllers.user.simlpleCreateConsultation = async (ctx) => {
                         since: dateSince,
                         until: dateUntil,
                         notifyCustomer: false,
-                        notifyUser: false
+                        notifyUser: false,
+                        publishedAt: new Date()
                         },
                     });
     
@@ -667,6 +687,7 @@ plugin.controllers.user.simlpleCreateConsultation = async (ctx) => {
                         status:  'occupied',
                         since: dateSince,
                         until: dateUntil,
+                        publishedAt: new Date()
                         },
                     });
     
@@ -686,6 +707,7 @@ plugin.controllers.user.simlpleCreateConsultation = async (ctx) => {
                                 status: 'occupied',
                                 since: dateSince,
                                 until: dateUntil,
+                                publishedAt: new Date()
                             },
                             });
                     
@@ -704,12 +726,29 @@ plugin.controllers.user.simlpleCreateConsultation = async (ctx) => {
                             message : "Consulta creada con exito",
                             newConsultation: newConsultation
                         }
-                    } else {   
-                    //borrar consulta
-                    //borrar consultationConsultingRoom
-                    //borrar consultingRoomHistory
-                    // borrar equipmentHistories
-                    // enviar respuesta negativa
+                    } else {
+                        equipmentHistories.forEach( async equitment => {
+                            await strapi.db.query('api::equipment-history.equipment-history').delete({
+                                where: { id: equitment.id },
+                            });
+                        });
+
+                        await strapi.db.query('api::consulting-room-history.consulting-room-history').delete({
+                            where: { id: consultingRoomHistory.id },
+                        });
+
+                        await strapi.db.query('api::consultation-consulting-room.consultation-consulting-room').delete({
+                            where: { id: consultationConsultingRoom.id },
+                        });
+                        
+                        await strapi.db.query('api::consultation.consultation').delete({
+                            where: { id: newConsultation.id },
+                        });
+
+                        ctx.response.status = 500;
+                        ctx.response.body = {
+                            message : "No se pudo registrar en la consulta, intentalo de nuevo",
+                        }
                     }
                 }
 
@@ -998,7 +1037,13 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
                                             message : `Se cancelo exitosamente la consulta`,
                                             cancelConsultation : cancelConsultation
                                         }
-                                    } 
+                                    } else {
+                                        ctx.response.status = 405;
+                                        ctx.response.body = {
+                                            message : `No se pudo cancelar la consulta, intentalo de nuevo`,
+                                            cancelConsultation : cancelConsultation
+                                        }  
+                                    }
                                     
                                 } catch (error) {
                                     ctx.response.status = 405;
@@ -1052,7 +1097,6 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
     }
 }
 
-  
 
     plugin.routes['content-api'].routes.push(
       {

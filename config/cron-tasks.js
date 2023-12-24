@@ -192,7 +192,8 @@ module.exports = {
                 await Promise.all(historyConsultationConsultingRooms.map(historyConsultationConsultingRoom => {
                     return strapi.db.query('api::consultation.consultation').update({
                         where: {
-                            id: historyConsultationConsultingRoom.consultation.id,
+                            id : historyConsultationConsultingRoom.consultation.id,
+                            status : 'pending'
                         },
                         data:
                             { status: 'in progress' }
@@ -231,6 +232,7 @@ module.exports = {
                     return strapi.db.query('api::consultation.consultation').update({
                         where: {
                             id: historyConsultationConsultingRoom.consultation.id,
+                            status : 'in progress'
                         },
                         data:
                             { status: 'finish' }

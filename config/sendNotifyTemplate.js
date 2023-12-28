@@ -62,7 +62,7 @@ async function sendNotifyTemplateToCollaborator( cellphone, name, nameCustumer, 
         maxBodyLength: Infinity,
         url: 'https://graph.facebook.com/v17.0/146235795241755/messages',
         headers: { 
-          'Authorization': `Bearer ${process.env.WHATSAPP_API_KEY}`, 
+          'Authorization': `Bearer ${process.env.WHATSAPP_CLOUD_API_KEY}`, 
           'Content-Type': 'application/json'
         },
         data : data
@@ -115,7 +115,7 @@ async function sendNotifyTemplateToCustomer( cellphone, name, lastname, hour ) {
         maxBodyLength: Infinity,
         url: 'https://graph.facebook.com/v17.0/146235795241755/messages',
         headers: { 
-          'Authorization': `Bearer ${process.env.WHATSAPP_API_KEY}`, 
+          'Authorization': `Bearer ${process.env.WHATSAPP_CLOUD_API_KEY}`, 
           'Content-Type': 'application/json'
         },
         data : data

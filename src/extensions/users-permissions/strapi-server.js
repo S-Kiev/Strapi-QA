@@ -49,7 +49,7 @@ plugin.controllers.user.sendCode = async (ctx) => {
                             } while (sameCode)
 
                             const validSince = new Date().getTime();
-                            const validUntil = validSince + 90000;
+                            const validUntil = validSince + 300000;
 
                             const number = res.cellphone;
                             

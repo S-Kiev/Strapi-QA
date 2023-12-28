@@ -4,7 +4,7 @@ const { sendCodeWhatsApp } = require('./sendCodeWhatsapp');
 
 module.exports = (plugin) => {
 
-  plugin.controllers.user.sendCode = async (ctx) => {
+plugin.controllers.user.sendCode = async (ctx) => {
 
             if ( ctx.request.body.username || ctx.request.body.email ) {
                 await strapi.query('plugin::users-permissions.user').findOne({
@@ -72,13 +72,8 @@ module.exports = (plugin) => {
 
                                     await sendCodeWhatsApp(code, number);
 
-                                    const jwtToken = strapi.plugins['users-permissions'].services.jwt.issue({
-                                        id: res.id
-                                    });
-
                                     ctx.response.status = 200;
                                     ctx.response.body = {
-                                        jwtToken,
                                         message: `Operacion ejecutada correctamente`,
                                         userId : userId,
                                     };
@@ -127,7 +122,6 @@ module.exports = (plugin) => {
         };
     }
 }
-
 
 plugin.controllers.user.changePasswordByWhatsapp = async (ctx) => {
 
@@ -184,11 +178,6 @@ plugin.controllers.user.changePasswordByWhatsapp = async (ctx) => {
         };
     }
 }
-
-
-//---------------------------------------------------------------------------------------------------
-
-console.log(plugin.controllers);
 
 plugin.controllers.user.botCreate = async (ctx) => {
     try {
@@ -1098,7 +1087,7 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
 }
 
 
-    plugin.routes['content-api'].routes.push(
+plugin.routes['content-api'].routes.push(
       {
         method: 'POST',
         path: '/user/sendCode',
@@ -1145,7 +1134,6 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
         },
       }
     )
-
     return plugin
 }
 

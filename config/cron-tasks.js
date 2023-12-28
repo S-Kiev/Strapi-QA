@@ -81,7 +81,7 @@ module.exports = {
         },
         options: {
             //'10 * * * * *' => 10s
-            rule: '* */30 * * * *',
+            rule: '* */5 * * * *',
             tz: 'America/Montreal'
         }
     },

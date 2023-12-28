@@ -56,10 +56,9 @@ plugin.controllers.user.sendCode = async (ctx) => {
 
                             const infoCode = {
                                 Code : code,
-                                //La tabla tiene una relacion 0 a 1 users_data
-                                user_id : res.id,
                                 validSince : validSince,
                                 validUntil : validUntil,
+                                user_datum : res.id,
                                 publishedAt: new Date()
                             }
 

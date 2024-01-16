@@ -1,0 +1,22 @@
+{
+  "kind": "collectionType",
+  "collectionName": "deleted_histories",
+  "info": {
+    "singularName": "deleted-history",
+    "pluralName": "deleted-histories",
+    "displayName": "DeletedHistory"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "historyName": {
+      "type": "string",
+      "required": true
+    },
+    "date": {
+      "type": "datetime"
+    }
+  }
+}

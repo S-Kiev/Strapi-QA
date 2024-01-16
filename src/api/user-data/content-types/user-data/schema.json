@@ -12,9 +12,6 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "userId": {
-      "type": "uid"
-    },
     "name": {
       "type": "string",
       "required": true
@@ -45,27 +42,8 @@
       "type": "string",
       "required": true
     },
-    "state": {
-      "type": "enumeration",
-      "enum": [
-        "enabled",
-        "locked",
-        "low"
-      ],
-      "required": true,
-      "default": "enabled"
-    },
     "deactivationDate": {
       "type": "datetime"
-    },
-    "activeHoursSince": {
-      "type": "datetime"
-    },
-    "activeHoursUntil": {
-      "type": "datetime"
-    },
-    "daysActiveHours": {
-      "type": "json"
     }
   }
 }

@@ -12,9 +12,6 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "consultingRoomId": {
-      "type": "uid"
-    },
     "name": {
       "type": "string",
       "required": true

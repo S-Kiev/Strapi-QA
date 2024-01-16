@@ -4,16 +4,14 @@
   "info": {
     "singularName": "measurements-customer",
     "pluralName": "measurements-customers",
-    "displayName": "measurementsCustomer"
+    "displayName": "measurementsCustomer",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
   },
   "pluginOptions": {},
   "attributes": {
-    "measurementsCustomerId": {
-      "type": "uid"
-    },
     "consultation": {
       "type": "relation",
       "relation": "oneToOne",

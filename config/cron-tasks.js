@@ -57,12 +57,18 @@ module.exports = {
                     await Promise.all(collaborators.map(async (notify) => {
                         const customerName = notify.customer.name;
                         const customerLastname = notify.customer.lastname;
-                        const customerCellphone = notify.customer.cellphone;
+                        const customerCellphoneStrapi = notify.customer.cellphone;
                         const customerProfession = notify.customer.profession;
                         const customerAddress = notify.customer.address;
     
                         const collaboratorName = notify.collaborator.name;
                         const collaboratorCellphone = notify.collaborator.cellphone;
+
+                        //Si la clinica tiene clientes internacionales aqui expandir logica segun caracteristica del pais
+                        const countryCode = customerCellphoneStrapi.substring(0, 3);
+                        const numberWithoutCountryCode = customerCellphoneStrapi.substring(3);
+                        const customerCellphone = "0" + numberWithoutCountryCode;
+
                         await sendNotifyTemplateToCollaborator(collaboratorCellphone, collaboratorName, customerName, customerLastname, customerProfession, customerAddress, customerCellphone);
                     }));
 
@@ -81,7 +87,7 @@ module.exports = {
         },
         options: {
             rule: '*/5 * * * *',
-            tz: 'America/Montreal'
+            tz: 'America/Montevideo'
         }
     },
     notifyCustomers: {
@@ -155,7 +161,7 @@ module.exports = {
         },
         options: {
             rule: '0 9 * * *',
-            tz: 'America/Montreal'
+            tz: 'America/Montevideo'
         }
 
     },
@@ -168,6 +174,7 @@ module.exports = {
 
             const thisMoment = new Date();
 
+            //Cambiar a esta fuente: 'api::consultation.consultation'
             const historyConsultationConsultingRooms = await strapi.db.query('api::consultation-consulting-room.consultation-consulting-room').findMany({
                 where: {
                     since: {
@@ -198,7 +205,7 @@ module.exports = {
         },
         options: {
             rule: '*/5 * * * *',
-            tz: 'America/Montreal'
+            tz: 'America/Montevideo'
         }
     },
 
@@ -233,7 +240,7 @@ module.exports = {
         },
         options: {
             rule: '* */30 * * * *',
-            tz: 'America/Montreal'
+            tz: 'America/Montevideo'
         }
     },
 
@@ -261,19 +268,23 @@ module.exports = {
     
             if (historyEquitments.length > 0){
                 await Promise.all(historyEquitments.map(historyEquitment => {
-                    return strapi.db.query('api::equipment.equipment').update({
-                        where: {
-                            id: historyEquitment.equipment.id,
-                        },
-                        data:
-                            { status: historyEquitment.status }
-                    });
+                    //Si elequipo esta broken que ignore cualquier accion
+                    if (historyEquitment.equipment.status !== 'broken'){
+                        return strapi.db.query('api::equipment.equipment').update({
+                            where: {
+                                id: historyEquitment.equipment.id,
+                            },
+                            data:
+                                { status: historyEquitment.status }
+                        });
+                    }
+
                 }));
             };
         },
         options: {
             rule: '*/5 * * * *',
-            tz: 'America/Montreal'
+            tz: 'America/Montevideo'
         }
     },
 
@@ -308,7 +319,7 @@ module.exports = {
         },
         options: {
             rule: '* */30 * * * *',
-            tz: 'America/Montreal'
+            tz: 'America/Montevideo'
         }
     },
 
@@ -347,7 +358,7 @@ module.exports = {
         },
         options: {
             rule: '*/5 * * * *',
-            tz: 'America/Montreal'
+            tz: 'America/Montevideo'
         }
     },
 
@@ -381,7 +392,7 @@ module.exports = {
         },
         options: {
             rule: '*/5 * * * *',
-            tz: 'America/Montreal'
+            tz: 'America/Montevideo'
         }
     }
 }

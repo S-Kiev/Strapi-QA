@@ -546,6 +546,11 @@ plugin.controllers.user.botCreate = async (ctx) => {
     }
 }
 
+// en modificar no update si no es pendiente
+// responsable, cliente no se edita
+// se edita : tratamientos (vine todo el array), consulting Room, since until
+
+
 plugin.controllers.user.simlpleCreateConsultation = async (ctx) => {
     try {
         if ( ctx.request.body &&
@@ -555,7 +560,8 @@ plugin.controllers.user.simlpleCreateConsultation = async (ctx) => {
             ctx.request.body.dateUntil &&
             ctx.request.body.treatments &&
             ctx.request.body.treatments.length > 0 &&
-            ctx.request.body.consultingRoomId
+            ctx.request.body.consultingsRooms &&
+            ctx.request.body.consultingsRooms > 0 
        ) { 
 
         const dateSince = new Date(ctx.request.body.dateSince);
@@ -589,11 +595,12 @@ plugin.controllers.user.simlpleCreateConsultation = async (ctx) => {
 
                
                 if(treatments.length> 0 && !treatments.includes(null)){
+                    //agregar desde y hasta // notifiaciones en false por defecto
                     const newConsultation = await strapi.db.query('api::consultation.consultation').create({
                         data: {
                           customer: ctx.request.body.customerId,
                           treatments: ctx.request.body.treatments.map(treatment => treatment),
-                          extraConsultingRoom:  ctx.request.body.extraConsultingRoomId ? ctx.request.body.extraConsultingRoomId : null,
+                          //extraConsultingRoom:  ctx.request.body.extraConsultingRoomId ? ctx.request.body.extraConsultingRoomId : null,
                           responsibleUser: ctx.request.body.responsibleUserId,
                           comments: ctx.request.body.comments ? ctx.request.body.comments : null,
                           status: 'pending',
@@ -601,18 +608,27 @@ plugin.controllers.user.simlpleCreateConsultation = async (ctx) => {
                         },
                       });
     
+                      /*
+                      consultingsRooms.map {
+                        idConsultingRoom: 1 //ctx.request.body.treatments.map(treatment => treatment),
+                        SINCE: dateTime
+                        until: dateTime
+                      }
+                      */
+                     //En la modificacion borrar si o si y hacer de nuevo la incercion
                       const consultationConsultingRoom = await strapi.db.query('api::consultation-consulting-room.consultation-consulting-room').create({
                         data: {
                         consultation: newConsultation.id,
                         consultingRoom: ctx.request.body.consultingRoomId,
                         since: dateSince,
                         until: dateUntil,
-                        notifyCustomer: false,
-                        notifyUser: false,
+                        //notifyCustomer: false,
+                        //notifyUser: false,
                         publishedAt: new Date()
                         },
                     });
-    
+                    //mapear el array consultingsRooms
+                    //En la modificacion borrar si o si y hacer de nuevo la incercion
                     const consultingRoomHistory = await strapi.db.query('api::consulting-room-history.consulting-room-history').create({
                         data: {
                         //consultingRoomHistoryId: x, ???

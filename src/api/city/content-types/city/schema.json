@@ -4,16 +4,14 @@
   "info": {
     "singularName": "city",
     "pluralName": "cities",
-    "displayName": "city"
+    "displayName": "city",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
   },
   "pluginOptions": {},
   "attributes": {
-    "cityId": {
-      "type": "uid"
-    },
     "cityName": {
       "type": "string",
       "required": true,

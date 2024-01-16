@@ -12,9 +12,6 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "consultationId": {
-      "type": "uid"
-    },
     "customer": {
       "type": "relation",
       "relation": "oneToOne",
@@ -24,10 +21,6 @@
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::treatment.treatment"
-    },
-    "extraConsultingRoom": {
-      "type": "boolean",
-      "default": false
     },
     "responsibleUser": {
       "type": "relation",
@@ -46,6 +39,18 @@
         "cancel"
       ],
       "default": "pending"
+    },
+    "since": {
+      "type": "datetime"
+    },
+    "until": {
+      "type": "datetime"
+    },
+    "notifyCustomer": {
+      "type": "boolean"
+    },
+    "notifyUser": {
+      "type": "boolean"
     }
   }
 }

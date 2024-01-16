@@ -4,16 +4,14 @@
   "info": {
     "singularName": "customer-payment",
     "pluralName": "customer-payments",
-    "displayName": "customerPayments"
+    "displayName": "customerPayments",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
   },
   "pluginOptions": {},
   "attributes": {
-    "customerPaymentId": {
-      "type": "uid"
-    },
     "consultation": {
       "type": "relation",
       "relation": "oneToOne",

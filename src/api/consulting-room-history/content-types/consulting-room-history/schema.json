@@ -4,16 +4,14 @@
   "info": {
     "singularName": "consulting-room-history",
     "pluralName": "consulting-room-histories",
-    "displayName": "consultingRoomHistory"
+    "displayName": "consultingRoomHistory",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
   },
   "pluginOptions": {},
   "attributes": {
-    "consultingRoomHistoryId": {
-      "type": "uid"
-    },
     "consulting_room": {
       "type": "relation",
       "relation": "oneToOne",
@@ -33,6 +31,11 @@
     },
     "until": {
       "type": "datetime"
+    },
+    "consultation": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::consultation.consultation"
     }
   }
 }

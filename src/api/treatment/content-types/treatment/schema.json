@@ -12,9 +12,6 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "treatmentId": {
-      "type": "uid"
-    },
     "name": {
       "type": "string",
       "required": true

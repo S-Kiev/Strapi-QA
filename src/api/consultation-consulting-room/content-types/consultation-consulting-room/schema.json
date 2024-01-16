@@ -29,12 +29,10 @@
       "type": "datetime"
     },
     "notifyCustomer": {
-      "type": "boolean",
-      "default": false
+      "type": "boolean"
     },
     "notifyUser": {
-      "type": "boolean",
-      "default": false
+      "type": "boolean"
     }
   }
 }

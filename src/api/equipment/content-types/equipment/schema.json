@@ -12,10 +12,6 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "equipmentId": {
-      "type": "uid",
-      "required": false
-    },
     "name": {
       "type": "string",
       "required": true

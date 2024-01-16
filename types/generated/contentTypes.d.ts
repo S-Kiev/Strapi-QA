@@ -683,12 +683,12 @@ export interface ApiCityCity extends Schema.CollectionType {
     singularName: 'city';
     pluralName: 'cities';
     displayName: 'city';
+    description: '';
   };
   options: {
     draftAndPublish: true;
   };
   attributes: {
-    cityId: Attribute.UID;
     cityName: Attribute.String & Attribute.Required & Attribute.Unique;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
@@ -712,7 +712,6 @@ export interface ApiConsultationConsultation extends Schema.CollectionType {
     draftAndPublish: true;
   };
   attributes: {
-    consultationId: Attribute.UID;
     customer: Attribute.Relation<
       'api::consultation.consultation',
       'oneToOne',
@@ -723,7 +722,6 @@ export interface ApiConsultationConsultation extends Schema.CollectionType {
       'oneToMany',
       'api::treatment.treatment'
     >;
-    extraConsultingRoom: Attribute.Boolean & Attribute.DefaultTo<false>;
     responsibleUser: Attribute.Relation<
       'api::consultation.consultation',
       'oneToOne',
@@ -734,6 +732,10 @@ export interface ApiConsultationConsultation extends Schema.CollectionType {
       ['pending', 'in progress', 'finish', 'cancel']
     > &
       Attribute.DefaultTo<'pending'>;
+    since: Attribute.DateTime;
+    until: Attribute.DateTime;
+    notifyCustomer: Attribute.Boolean;
+    notifyUser: Attribute.Boolean;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -777,8 +779,8 @@ export interface ApiConsultationConsultingRoomConsultationConsultingRoom
     >;
     since: Attribute.DateTime;
     until: Attribute.DateTime;
-    notifyCustomer: Attribute.Boolean & Attribute.DefaultTo<false>;
-    notifyUser: Attribute.Boolean & Attribute.DefaultTo<false>;
+    notifyCustomer: Attribute.Boolean;
+    notifyUser: Attribute.Boolean;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -850,7 +852,6 @@ export interface ApiConsultingRoomConsultingRoom extends Schema.CollectionType {
     draftAndPublish: true;
   };
   attributes: {
-    consultingRoomId: Attribute.UID;
     name: Attribute.String & Attribute.Required;
     description: Attribute.Text;
     necessaryAction: Attribute.Text;
@@ -881,12 +882,12 @@ export interface ApiConsultingRoomHistoryConsultingRoomHistory
     singularName: 'consulting-room-history';
     pluralName: 'consulting-room-histories';
     displayName: 'consultingRoomHistory';
+    description: '';
   };
   options: {
     draftAndPublish: true;
   };
   attributes: {
-    consultingRoomHistoryId: Attribute.UID;
     consulting_room: Attribute.Relation<
       'api::consulting-room-history.consulting-room-history',
       'oneToOne',
@@ -896,6 +897,11 @@ export interface ApiConsultingRoomHistoryConsultingRoomHistory
       Attribute.DefaultTo<'available'>;
     since: Attribute.DateTime;
     until: Attribute.DateTime;
+    consultation: Attribute.Relation<
+      'api::consulting-room-history.consulting-room-history',
+      'oneToOne',
+      'api::consultation.consultation'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -921,12 +927,12 @@ export interface ApiCustomerMedicalInformationCustomerMedicalInformation
     singularName: 'customer-medical-information';
     pluralName: 'customer-medical-informations';
     displayName: 'customerMedicalInformation';
+    description: '';
   };
   options: {
     draftAndPublish: true;
   };
   attributes: {
-    customerMedicalInformationId: Attribute.UID;
     customer: Attribute.Relation<
       'api::customer-medical-information.customer-medical-information',
       'oneToOne',
@@ -972,12 +978,12 @@ export interface ApiCustomerPaymentCustomerPayment
     singularName: 'customer-payment';
     pluralName: 'customer-payments';
     displayName: 'customerPayments';
+    description: '';
   };
   options: {
     draftAndPublish: true;
   };
   attributes: {
-    customerPaymentId: Attribute.UID;
     consultation: Attribute.Relation<
       'api::customer-payment.customer-payment',
       'oneToOne',
@@ -1022,7 +1028,6 @@ export interface ApiCustomerPersonalInformationCustomerPersonalInformation
     draftAndPublish: true;
   };
   attributes: {
-    customerId: Attribute.UID;
     name: Attribute.String & Attribute.Required;
     lastname: Attribute.String & Attribute.Required;
     document: Attribute.String & Attribute.Required;
@@ -1061,6 +1066,37 @@ export interface ApiCustomerPersonalInformationCustomerPersonalInformation
   };
 }
 
+export interface ApiDeletedHistoryDeletedHistory extends Schema.CollectionType {
+  collectionName: 'deleted_histories';
+  info: {
+    singularName: 'deleted-history';
+    pluralName: 'deleted-histories';
+    displayName: 'DeletedHistory';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    historyName: Attribute.String & Attribute.Required;
+    date: Attribute.DateTime;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::deleted-history.deleted-history',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::deleted-history.deleted-history',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiEquipmentEquipment extends Schema.CollectionType {
   collectionName: 'equipments';
   info: {
@@ -1073,7 +1109,6 @@ export interface ApiEquipmentEquipment extends Schema.CollectionType {
     draftAndPublish: true;
   };
   attributes: {
-    equipmentId: Attribute.UID;
     name: Attribute.String & Attribute.Required;
     brand: Attribute.String & Attribute.Required;
     description: Attribute.Text;
@@ -1107,12 +1142,12 @@ export interface ApiEquipmentHistoryEquipmentHistory
     singularName: 'equipment-history';
     pluralName: 'equipment-histories';
     displayName: 'equipmentHistory';
+    description: '';
   };
   options: {
     draftAndPublish: true;
   };
   attributes: {
-    equipmentHistoryId: Attribute.UID;
     equipment: Attribute.Relation<
       'api::equipment-history.equipment-history',
       'oneToOne',
@@ -1123,6 +1158,12 @@ export interface ApiEquipmentHistoryEquipmentHistory
     >;
     since: Attribute.DateTime;
     until: Attribute.DateTime;
+    consultation: Attribute.Relation<
+      'api::equipment-history.equipment-history',
+      'oneToOne',
+      'api::consultation.consultation'
+    >;
+    canceledRental: Attribute.Boolean & Attribute.DefaultTo<false>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1148,12 +1189,12 @@ export interface ApiMeasurementsCustomerMeasurementsCustomer
     singularName: 'measurements-customer';
     pluralName: 'measurements-customers';
     displayName: 'measurementsCustomer';
+    description: '';
   };
   options: {
     draftAndPublish: true;
   };
   attributes: {
-    measurementsCustomerId: Attribute.UID;
     consultation: Attribute.Relation<
       'api::measurements-customer.measurements-customer',
       'oneToOne',
@@ -1241,7 +1282,6 @@ export interface ApiTreatmentTreatment extends Schema.CollectionType {
     draftAndPublish: true;
   };
   attributes: {
-    treatmentId: Attribute.UID;
     name: Attribute.String & Attribute.Required;
     description: Attribute.Text;
     equipments: Attribute.Relation<
@@ -1285,7 +1325,6 @@ export interface ApiUserDataUserData extends Schema.CollectionType {
     draftAndPublish: true;
   };
   attributes: {
-    userId: Attribute.UID;
     name: Attribute.String & Attribute.Required;
     lastname: Attribute.String & Attribute.Required;
     document: Attribute.String & Attribute.Required;
@@ -1301,13 +1340,7 @@ export interface ApiUserDataUserData extends Schema.CollectionType {
       'api::city.city'
     >;
     address: Attribute.String & Attribute.Required;
-    state: Attribute.Enumeration<['enabled', 'locked', 'low']> &
-      Attribute.Required &
-      Attribute.DefaultTo<'enabled'>;
     deactivationDate: Attribute.DateTime;
-    activeHoursSince: Attribute.DateTime;
-    activeHoursUntil: Attribute.DateTime;
-    daysActiveHours: Attribute.JSON;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1351,6 +1384,7 @@ declare module '@strapi/types' {
       'api::customer-medical-information.customer-medical-information': ApiCustomerMedicalInformationCustomerMedicalInformation;
       'api::customer-payment.customer-payment': ApiCustomerPaymentCustomerPayment;
       'api::customer-personal-information.customer-personal-information': ApiCustomerPersonalInformationCustomerPersonalInformation;
+      'api::deleted-history.deleted-history': ApiDeletedHistoryDeletedHistory;
       'api::equipment.equipment': ApiEquipmentEquipment;
       'api::equipment-history.equipment-history': ApiEquipmentHistoryEquipmentHistory;
       'api::measurements-customer.measurements-customer': ApiMeasurementsCustomerMeasurementsCustomer;

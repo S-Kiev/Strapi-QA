@@ -33,12 +33,9 @@ plugin.controllers.user.sendCode = async (ctx) => {
                             let code
                             let sameCode
 
-
                             do {
                                 const randomBytes = crypto.randomBytes(3);
-                                console.log(randomBytes);
                                 code = randomBytes.toString('hex').slice(0, 6);
-                                console.log(code);
 
 
                                 sameCode = await strapi.db.query('api::recovery-code.recovery-code').findOne({
@@ -66,8 +63,6 @@ plugin.controllers.user.sendCode = async (ctx) => {
                             await strapi.db.query('api::recovery-code.recovery-code').create({data : infoCode})
                             .then( async (res)=>{
                                 try {
-                                    console.log(code);
-                                    console.log(infoCode.Code);
 
                                     await sendCodeWhatsApp(code, number);
 
@@ -77,7 +72,6 @@ plugin.controllers.user.sendCode = async (ctx) => {
                                         userId : userId,
                                     };
                                 } catch (error) {
-                                    console.log(error);
                                     ctx.response.status = 405;
                                     ctx.body = {
                                         message: `No se pudo enviar el código por WhatsApp`,
@@ -124,7 +118,6 @@ plugin.controllers.user.sendCode = async (ctx) => {
 
 plugin.controllers.user.changePasswordByWhatsapp = async (ctx) => {
 
-    console.log(ctx.request.body);
     if ( ctx.request.body && ctx.request.body.code && ctx.request.body.newPassword && ctx.request.body.id ){
         await strapi.db.query('api::recovery-code.recovery-code').findOne({
             where: { code: ctx.request.body.code }
@@ -180,7 +173,6 @@ plugin.controllers.user.changePasswordByWhatsapp = async (ctx) => {
 
 plugin.controllers.user.botCreate = async (ctx) => {
     try {
-        console.log(ctx.request.body);
 
         if ( ctx.request.body && 
              ctx.request.body.userNumber && 
@@ -204,9 +196,6 @@ plugin.controllers.user.botCreate = async (ctx) => {
                         lastname: {$eqi: ctx.request.body.customerLastname}
                     }
                 });
-                console.log("----------------------------------------------");
-                console.log("customer =>");
-                console.log(customer);
 
                 
                 if(customer){
@@ -217,18 +206,12 @@ plugin.controllers.user.botCreate = async (ctx) => {
                         }
                     });
 
-                    console.log("----------------------------------------------");
-                    console.log("responsibleUser =>");
-                    console.log(responsibleUser);
-
                     
                     if(responsibleUser){
 
                         //puede ser un array => recorrerlo con un map
                         //ctx.request.body.treatments => ["tratamineto1" , "tratamineto2"]
-                        console.log(ctx.request.body.treatments);
                         const treatments = await Promise.all(ctx.request.body.treatments.map(async treatmentName => {
-                            console.log(treatmentName);
                             const treatment = await strapi.db.query('api::treatment.treatment').findOne({
                                 where: { 
                                     name: {$eqi: treatmentName},
@@ -241,16 +224,11 @@ plugin.controllers.user.botCreate = async (ctx) => {
                             if (!treatment) {
                                 // Tratamiento no encontrado, manejar este caso según tus necesidades
                                 console.log(`Tratamiento no encontrado: ${treatmentName}`);
+                                return null;
                             }
                     
                             return treatment;
                         }));
-
-                        console.log("----------------------------------------------");
-                        console.log("treatments =>");
-                        console.log(treatments);
-                        console.log(treatments.length> 0);
-                        console.log(!treatments.includes(null));
  
                         
                         if(treatments.length> 0 && !treatments.includes(null)){
@@ -261,9 +239,6 @@ plugin.controllers.user.botCreate = async (ctx) => {
                                 }
                             });
 
-                            console.log("----------------------------------------------");
-                            console.log("consultingRoom =>");
-                            console.log(consultingRoom);
 
                             
                             if(consultingRoom) {
@@ -291,9 +266,6 @@ plugin.controllers.user.botCreate = async (ctx) => {
                                         },
                                     })
 
-                                    console.log(cosultation);
-                                    console.log(notAvailableConsultationConsultingRoom.consultingRoom.id === consultingRoom.id);
-
 
                                     //Si hay una consulta valida, esas fechas, y el consultorio en el que se quiere registrar ya esta ocupado retorno true
                                    if (cosultation && notAvailableConsultationConsultingRoom.consultingRoom.id === consultingRoom.id){
@@ -301,13 +273,6 @@ plugin.controllers.user.botCreate = async (ctx) => {
                                    } 
                                    return false;
                                 }));
-
-
-                                console.log("----------------------------------------------");
-                                console.log("notAvailableConsultationConsultingRooms =>");
-                                console.log(notAvailableConsultationConsultingRooms);
-
-                                console.log(!consultingRoomOccupied.includes(true));
               
                                 //Si se encontro una consulta valida esas fechas en ese consultorio entonces no tiene que pasar este if
                                 if(!consultingRoomOccupied.includes(true)){
@@ -323,19 +288,13 @@ plugin.controllers.user.botCreate = async (ctx) => {
                                         }
                                     });
 
-                                    console.log("----------------------------------------------");
-                                    console.log("notAvailableConsultingRooms =>");
-                                    console.log(notAvailableConsultingRooms);
-
                                     //Quiero que el array venga vacio, que significa que el consultorio esta disponible
                                     if(notAvailableConsultingRooms === null) {
                                         //Aqui podria fallar porque treatments puede ser un array con varios tratamientos que a su vez tiene aotro array en equipments
                                         const notAvailableEquitments = await Promise.all(treatments.map(async treatment => {
-                                            console.log("treatment.equipments =>" + treatment.equipments);
                                             const equipments = treatment.equipments;
                                         
                                             const equipmentPromises = equipments.map(async equipment => {
-                                                console.log("equipment =>" + equipment);
                                                 const historyEquipment = await strapi.db.query('api::equipment-history.equipment-history').findOne({
                                                     where: { 
                                                         since: { $gte : dateSince},
@@ -344,17 +303,12 @@ plugin.controllers.user.botCreate = async (ctx) => {
                                                         status: { $ne : 'available' },
                                                     }
                                                 });
-                                                console.log("historyEquipment =>" + historyEquipment);
                                                 return historyEquipment;
                                             });
                                         
                                             // Espera a que todas las promesas internas se resuelvan antes de pasar al siguiente tratamiento
                                             return Promise.all(equipmentPromises);
                                         }));
-
-                                        console.log("----------------------------------------------");
-                                        console.log("notAvailableEquitment =>");
-                                        console.log(notAvailableEquitments);
                                         
                                         //Si cada elemento del array vine null, quiere decir que los equipos estan disponibles"
                                         if (notAvailableEquitments.every(equipmentArray => equipmentArray.every(historyEquipment => historyEquipment === null))) {
@@ -386,7 +340,6 @@ plugin.controllers.user.botCreate = async (ctx) => {
                                                             publishedAt: new Date()
                                                             },
                                                         });
-                                                        console.log(consultationConsultingRoom);
                                                         
                                                         if(consultationConsultingRoom) {
                                                             const consultingRoomHistory = await strapi.db.query('api::consulting-room-history.consulting-room-history').create({
@@ -616,7 +569,6 @@ plugin.controllers.user.simlpleCreateConsultation = async (ctx) => {
 
 
                 const treatments = await Promise.all(ctx.request.body.treatments.map(async treatmentId => {
-                    console.log(treatmentId);
                     const treatment = await strapi.db.query('api::treatment.treatment').findOne({
                         where: {
                             id: treatmentId,
@@ -628,19 +580,12 @@ plugin.controllers.user.simlpleCreateConsultation = async (ctx) => {
 
 
                     if (!treatment) {
-                        // Tratamiento no encontrado, manejar este caso según tus necesidades
                         console.log(`Tratamiento no encontrado: ${treatment}`);
+                        return null;
                     }
            
                     return treatment;
                 }));
-
-
-                console.log("----------------------------------------------");
-                console.log("treatments =>");
-                console.log(treatments);
-                console.log(treatments.length> 0);
-                console.log(!treatments.includes(null));
 
                
                 if(treatments.length> 0 && !treatments.includes(null)){
@@ -775,8 +720,6 @@ plugin.controllers.user.simlpleCreateConsultation = async (ctx) => {
 
 plugin.controllers.user.cancelConsultation = async (ctx) => {
     try {
-        console.log("ctx.request.body => ");
-        console.log(ctx.request.body);
         if ( 
             ctx.request.body &&
              ctx.request.body.userNumber &&
@@ -787,10 +730,6 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
         ) { 
             const dateSince = new Date(ctx.request.body.dateSince);
             const dateUntil = new Date(ctx.request.body.dateUntil);
-            console.log("dateSince => ");
-            console.log(dateSince);
-            console.log("dateUntil => ");
-            console.log(dateUntil);
             
 
             // SI LAS FECHAS NO VIENEN EN EL FORMATO DATE TIME ('AAAA-MM-DDTHH:MM:SS'), Y LA DECHA HASTA NO ES MAYOR A DESDE NO PASA
@@ -802,9 +741,6 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
                         lastname: { $eqi :ctx.request.body.customerLastname }
                     }
                 });
-                console.log("----------------------------------------------");
-                console.log("customer =>");
-                console.log(customer);
 
                 if (customer) { 
                     const responsibleUser = await strapi.db.query('api::user-data.user-data').findOne({
@@ -813,18 +749,11 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
                         }
                     });
 
-
-                    console.log("----------------------------------------------");
-                    console.log("responsibleUser =>");
-                    console.log(responsibleUser);
-
                     if(responsibleUser){
 
                         const consultationConsultingRoomsThisDay2 = await strapi.db.query('api::consultation-consulting-room.consultation-consulting-room').findMany({ 
                             populate : true
                         });
-                        console.log("consultationConsultingRoomsThisDay => ");
-                        console.log(consultationConsultingRoomsThisDay2);
 
                         //ME TRAERA LOS REGISTROS DE ESE DIA 
                         const consultationConsultingRoomsThisDay = await strapi.db.query('api::consultation-consulting-room.consultation-consulting-room').findMany({
@@ -835,10 +764,6 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
                             populate : true
                         });
 
-                        console.log("--------------------------------------------------------------");
-                        console.log("consultationConsultingRoomsThisDay => ");
-
-                        console.log(consultationConsultingRoomsThisDay);
 
                         if(consultationConsultingRoomsThisDay.length > 0 && !consultationConsultingRoomsThisDay.includes(null)){
 
@@ -850,30 +775,9 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
                                     }, 
                                     populate : true
                                 });
-                                console.log("consultation => ");
-                                console.log(consultation);
+
                                 const customerInArray = consultation.customer;
-                                console.log("customerInArray => ");
-                                console.log(customerInArray);
                                 const responsibleUserInArray = consultation.responsibleUser;
-                                console.log("responsibleUserInArray => ");
-                                console.log(responsibleUserInArray);
-
-
-
-                                //ME TRAERA LA CONSULTA DE ESE CLIENTE (SUPONIENDO QUE ES UNA)
-                                //SI ES MAS DE 1 PODRIA USAR LA HORA?
-                                console.log("----------------------------------------------------------");
-
-                                console.log("customerInArray.id => " + customerInArray.id);
-                                console.log("customer.id => " + customer.id);
-                                console.log("customerInArray.id === customer.id => " + customerInArray.id === customer.id);
-                                console.log("----------------------------------------------------------");
-
-                                console.log("responsibleUserInArray.id => " + responsibleUserInArray.id);
-                                console.log("responsibleUser.id => " + responsibleUser.id);
-                                console.log("responsibleUserInArray.id === responsibleUser.id => " + responsibleUserInArray.id === responsibleUser.id);
-                                console.log("----------------------------------------------------------");
 
 
                                 if(customerInArray.id === customer.id && responsibleUserInArray.id === responsibleUser.id) {
@@ -881,30 +785,11 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
                                 }
                             }));
 
-                            console.log("consultationConsultingRooms => ");
-                            console.log(consultationConsultingRooms);
-
-                            console.log("consultationConsultingRooms.length === 1 => ");
-                            console.log(consultationConsultingRooms.length === 1);
-
-                            console.log("(!consultationConsultingRooms.includes(null) || !consultationConsultingRooms.includes(undefined)) => ");
-                            console.log((!consultationConsultingRooms.includes(null) || !consultationConsultingRooms.includes(undefined)));
-
 
                             //=>MAP REGRESA UN ARRAY PERO DEBERIA SER UN ARRAY CON UN ELEMENTO, EL QUE ESTOY BUSCANDO
                             if(consultationConsultingRooms.length === 1 && (!consultationConsultingRooms.includes(null) || !consultationConsultingRooms.includes(undefined))){
                                 try {
-
-                                    console.log ("Llegamos a las modificaciones")
                                     const consultationConsultingRoomsUpadte = await Promise.all(consultationConsultingRooms.map(async consultationConsultingRoom=>{
-                                        console.log("consultationConsultingRoom.consultingRoom.id => ");
-                                        console.log(consultationConsultingRoom.consultingRoom.id);
-
-                                        console.log("consultationConsultingRoom.since => ");
-                                        console.log(consultationConsultingRoom.since);
-
-                                        console.log("consultationConsultingRoom.until => ");
-                                        console.log(consultationConsultingRoom.until);
 
 
                                         const seeHistory = await strapi.db.query('api::consulting-room-history.consulting-room-history').findOne({  
@@ -914,8 +799,6 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
                                                 until: consultationConsultingRoom.until
                                             }
                                         });
-
-                                        console.log("seeHistory => " + seeHistory);
 
                                          return await strapi.db.query('api::consulting-room-history.consulting-room-history').update({  
                                             where: {
@@ -927,8 +810,6 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
                                              { status: 'available' }
                                         });
                                     }));
-
-                                    console.log("consultationConsultingRoomsUpadte => " + consultationConsultingRoomsUpadte);
 
                                     const equipmentHistoryPromises = [];
 
@@ -943,8 +824,6 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
                                         });
                                     }));
 
-                                    console.log("consultations => " + consultations);
-
                                     consultations.forEach(async consultation => {
                                         
                                         const allTreatments = await Promise.all(consultation.treatments.map(async treatment =>{
@@ -958,14 +837,12 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
                                             });
                                         }));
 
-                                        console.log ("allTreatments => " + allTreatments);
-
                                         if (allTreatments[0].length > 0) {
                                                 // Iterar sobre cada conjunto de tratamientos
                                                 allTreatments.forEach(treatmentsSet => {
                                                     // Iterar sobre cada tratamiento dentro del conjunto
                                                     treatmentsSet.forEach(treatment => {
-                                                        console.log(treatment.equipments); // Acceder a los equipos de cada tratamiento
+                                                        // Acceder a los equipos de cada tratamiento
 
                                             if (treatment.equipments && treatment.equipments.length > 0) {
                                                                 treatment.equipments.forEach(async equipment => {
@@ -976,12 +853,6 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
                                                                             until: consultationConsultingRooms[0].until,
                                                                         }
                                                                     });
-
-                                                                    console.log("seeEquipmentHistory => " + seeEquipmentHistory);
-
-                                                                    console.log("equipment.id => " + equipment.id);
-                                                                    console.log("consultationConsultingRooms[0].since => " + consultationConsultingRooms[0].since);
-                                                                    console.log("consultationConsultingRooms[0].until => " + consultationConsultingRooms[0].until);
 
                                                                     const equipmentHistoryPromise = await strapi.db.query('api::equipment-history.equipment-history').update({
                                                                         where: {
@@ -1005,8 +876,6 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
                                     // Aqui todas las promesas de bambio de estado de los historiales de equipo se concretan
                                     const equipmentHistoryUpadte = await Promise.all(equipmentHistoryPromises);
 
-                                    console.log("equipmentHistoryUpadte => " + equipmentHistoryUpadte);
-
                                     const cancelConsultation = await Promise.all(consultationConsultingRooms.map(async consultationConsultingRoom => {
                                         return await strapi.db.query('api::consultation.consultation').update({  
                                             where: {
@@ -1016,8 +885,6 @@ plugin.controllers.user.cancelConsultation = async (ctx) => {
                                              { status: 'cancel' }
                                         });
                                     }));
-
-                                    console.log("cancelConsultation => " + cancelConsultation)
 
                                     if (cancelConsultation){
                                         ctx.response.status = 200;

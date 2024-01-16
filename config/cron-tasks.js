@@ -80,8 +80,7 @@ module.exports = {
             }
         },
         options: {
-            //'10 * * * * *' => 10s
-            rule: '* */5 * * * *',
+            rule: '*/5 * * * *',
             tz: 'America/Montreal'
         }
     },
@@ -116,8 +115,6 @@ module.exports = {
             if (consultingRoomsOccupiedTomorrow.length > 0) {
 
                 const hour = consultingRoomsOccupiedTomorrow[0].since;
-
-                //console.log(consultingRoomsOccupiedTomorrow);
 
                 const customer = await Promise.all(consultingRoomsOccupiedTomorrow
                     .map(async consultingRoom => {
@@ -157,7 +154,7 @@ module.exports = {
             }
         },
         options: {
-            rule: '* */30 * * * *', //=> 15s
+            rule: '0 9 * * *',
             tz: 'America/Montreal'
         }
 
@@ -185,8 +182,6 @@ module.exports = {
                 }
             });
 
-            //console.log("historyConsultationConsultingRooms en horario de consulta =>");
-            //console.log(historyConsultationConsultingRooms);
 
             if (historyConsultationConsultingRooms.length > 0){
                 await Promise.all(historyConsultationConsultingRooms.map(historyConsultationConsultingRoom => {
@@ -202,7 +197,7 @@ module.exports = {
             }
         },
         options: {
-            rule: '* */30 * * * *',
+            rule: '*/5 * * * *',
             tz: 'America/Montreal'
         }
     },
@@ -221,10 +216,6 @@ module.exports = {
                     consultation: true
                 }
             });
-
-
-            //console.log("historyConsultationRoomsHistory Que paso la hora =>");
-            //console.log(historyConsultationConsultingRooms);
 
             
             if (historyConsultationConsultingRooms.length > 0){
@@ -267,10 +258,6 @@ module.exports = {
                 }
             });
 
-            console.log("historyEquitments en horario de consulta =>");
-
-            console.log(historyEquitments);
-
     
             if (historyEquitments.length > 0){
                 await Promise.all(historyEquitments.map(historyEquitment => {
@@ -285,7 +272,7 @@ module.exports = {
             };
         },
         options: {
-            rule: '* */30 */1 * * *',
+            rule: '*/5 * * * *',
             tz: 'America/Montreal'
         }
     },
@@ -306,9 +293,6 @@ module.exports = {
                     equipment : true
                 }
             });
-            //console.log("historyEquitments Que paso la hora =>");
-
-            //console.log(historyEquitments);
 
             if (historyEquitments.length > 0) {
                 await Promise.all(historyEquitments.map(historyEquitment => {
@@ -349,10 +333,6 @@ module.exports = {
                 }
             });
 
-            //console.log("historyConsutingRooms en horario de consulta =>");
-
-            //console.log(historyConsutingRooms);
-
             if (historyConsutingRooms.length > 0){
                 await Promise.all(historyConsutingRooms.map(historyConsutingRoom => {
                     return strapi.db.query('api::consulting-room.consulting-room').update({
@@ -366,7 +346,7 @@ module.exports = {
             }
         },
         options: {
-            rule: '* */30 * * * *',
+            rule: '*/5 * * * *',
             tz: 'America/Montreal'
         }
     },
@@ -385,9 +365,7 @@ module.exports = {
                     consulting_room : true
                 }
             });
-            //console.log("consutingRooms Que paso la hora =>");
 
-            //console.log(historyConsutingRooms);
 
             if (historyConsutingRooms.length > 0){
                 await Promise.all(historyConsutingRooms.map(historyConsutingRoom => {
@@ -402,7 +380,7 @@ module.exports = {
             }
         },
         options: {
-            rule: '* */30 * * * *',
+            rule: '*/5 * * * *',
             tz: 'America/Montreal'
         }
     }

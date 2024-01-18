@@ -14,8 +14,7 @@ module.exports = {
             const fifteenMinutesBefore = new Date();
             fifteenMinutesBefore.setMinutes(fifteenMinutesBefore.getMinutes() + 15);
 
-
-            const consultingRoomsOccupiedfifteenMinutesBefore = await strapi.db.query('api::consultation-consulting-room.consultation-consulting-room').findMany({
+            const consultations = await strapi.db.query('api::consultation.consultation').findMany({
                 where: {
                     since: {
                         $gte: thisMoment,
@@ -26,45 +25,26 @@ module.exports = {
                     }
                 },
                 populate: {
-                    consultation: true,
-                },
+                    responsibleUser: true,
+                    customer: true,
+                }
             });
 
 
-            if (consultingRoomsOccupiedfifteenMinutesBefore.length > 0) {
 
-                const collaborators = await Promise.all(consultingRoomsOccupiedfifteenMinutesBefore
-                    .map(async collaborator => {
+                if(consultations.length > 0) {
 
-                        const collaboratorInfo = await strapi.db.query('api::consultation.consultation').findOne({
-                            where: {
-                                id: collaborator.consultation.id,
-                            },
-                            populate: {
-                                responsibleUser: true,
-                                customer: true,
-                            }
-                        });
-
-                        return {
-                            collaborator: collaboratorInfo.responsibleUser,
-                            customer: collaboratorInfo.customer,
-                            hour: collaborator.since
-                        };
-                    }));
-
-                if(collaborators.length > 0) {
-                    await Promise.all(collaborators.map(async (notify) => {
-                        const customerName = notify.customer.name;
-                        const customerLastname = notify.customer.lastname;
-                        const customerCellphoneStrapi = notify.customer.cellphone;
-                        const customerProfession = notify.customer.profession;
-                        const customerAddress = notify.customer.address;
+                    await Promise.all(consultations.map( async (consultation) => {
+                        const customerName = consultation.customer.name;
+                        const customerLastname = consultation.customer.lastname;
+                        const customerCellphoneStrapi = consultation.customer.cellphone;
+                        const customerProfession = consultation.customer.profession;
+                        const customerAddress = consultation.customer.address;
     
-                        const collaboratorName = notify.collaborator.name;
-                        const collaboratorCellphone = notify.collaborator.cellphone;
+                        const collaboratorName = consultation.responsibleUser.name;
+                        const collaboratorCellphone = consultation.responsibleUser.cellphone;
 
-                        //Si la clinica tiene clientes internacionales aqui expandir logica segun caracteristica del pais
+                        //Si la clinica tiene clientes internacionales aqui expandir logica (de zona horaria) segun caracteristica del pais
                         const countryCode = customerCellphoneStrapi.substring(0, 3);
                         const numberWithoutCountryCode = customerCellphoneStrapi.substring(3);
                         const customerCellphone = "0" + numberWithoutCountryCode;
@@ -72,16 +52,15 @@ module.exports = {
                         await sendNotifyTemplateToCollaborator(collaboratorCellphone, collaboratorName, customerName, customerLastname, customerProfession, customerAddress, customerCellphone);
                     }));
 
-                    await Promise.all(consultingRoomsOccupiedfifteenMinutesBefore.map(async (consultingRooms) => {
-                        return strapi.db.query('api::consultation-consulting-room.consultation-consulting-room').update({
+                    await Promise.all(consultations.map(async (consultation) => {
+                        return strapi.db.query('api::consultation.consultation').update({
                             where: {
-                                id: consultingRooms.id
+                                id: consultation.id
                             },
                             data:
                                 { notifyUser: true }
                         });
                     }));
-                }
 
             }
         },
@@ -103,7 +82,7 @@ module.exports = {
             tomorrowEnd.setHours(23, 59, 59, 999);
 
 
-            const consultingRoomsOccupiedTomorrow = await strapi.db.query('api::consultation-consulting-room.consultation-consulting-room').findMany({
+            const consultations = await strapi.db.query('api::consultation.consultation').findMany({
                 where: {
                     since: {
                         $gte: tomorrowStart,
@@ -114,49 +93,28 @@ module.exports = {
                     }
                 },
                 populate: {
-                    consultation: true,
-                },
+                    customer: true,
+                }
             });
 
-            if (consultingRoomsOccupiedTomorrow.length > 0) {
 
-                const hour = consultingRoomsOccupiedTomorrow[0].since;
+            if (consultations.length > 0) {
+                await Promise.all(consultations.map(async (consultation) => {
+                        const name = consultation.customer.name;
+                        const lastname = consultation.customer.lastname;
+                        const cellphone = consultation.customer.cellphone;
+                        await sendNotifyTemplateToCustomer(cellphone, name, lastname, consultation.since);
+                }));
 
-                const customer = await Promise.all(consultingRoomsOccupiedTomorrow
-                    .map(async consultingRoom => {
-                        const consultationInfo = await strapi.db.query('api::consultation.consultation').findOne({
+                await Promise.all(consultations.map(async (consultation) => {
+                    return strapi.db.query('api::consultation.consultation').update({
                             where: {
-                                id: consultingRoom.consultation.id,
-                            },
-                            populate: {
-                                customer: true,
-                            },
-                        });
-
-                        return {
-                            customer: consultationInfo.customer,
-                            hour: consultingRoom.since, 
-                        };
-                    }));
-
-                if (customer.length > 0) {
-                    await Promise.all(customer.map(async (notify) => {
-                        const name = notify.customer.name;
-                        const lastname = notify.customer.lastname;
-                        const cellphone = notify.customer.cellphone;
-                        await sendNotifyTemplateToCustomer(cellphone, name, lastname, hour);
-                    }));
-
-                    await Promise.all(consultingRoomsOccupiedTomorrow.map(async (consultingRooms) => {
-                        return strapi.db.query('api::consultation-consulting-room.consultation-consulting-room').update({
-                            where: {
-                                id: consultingRooms.id
+                                id: consultation.id
                             },
                             data:
                                 { notifyCustomer: true }
                         });
-                    }));
-                }
+                }));
             }
         },
         options: {

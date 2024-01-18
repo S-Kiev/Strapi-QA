@@ -605,6 +605,8 @@ module.exports = (plugin) => {
                         }
                     }))
 
+                    //VALIDACIONES DE LOS HISTORIALES
+
                     if (flag) {
                         try {
                             const treatments = await Promise.all(ctx.request.body.treatments.map(async treatmentId => {
@@ -1214,6 +1216,8 @@ module.exports = (plugin) => {
     }
 
     plugin.controllers.user.simlpleCancelConsultation = async (ctx) => {
+
+        console.log(ctx.request.body.consultationId);
         try {
             if (ctx.request.body &&
                 ctx.request.body.consultationId
@@ -1222,9 +1226,11 @@ module.exports = (plugin) => {
                 const consultation = await strapi.db.query('api::consultation.consultation').findOne({
                     where: {
                         id: ctx.request.body.consultationId,
-                        status: { $eq: 'pending' }
+                        status: { $eqi: 'pending' }
                     }
                 });
+                console.log(consultation);
+
 
                 if (consultation) {
 
@@ -1237,31 +1243,59 @@ module.exports = (plugin) => {
                         },
                     });
 
-                    let consultingRoomsHistories;
+                console.log(cancelConsultation);
                     // necesito los ids de los consultorios de esa consulta para cambiarles el estado en su historial
                     // consultation-consulting-room no tiene status asi que no se toca nada
 
-                    const consultingsRoomsHistories = await strapi.db.query('api::consulting-room-history.consulting-room-history').updateMany({
+                    const consultingRoomsHistories = await strapi.db.query('api::consulting-room-history.consulting-room-history').findMany({
                         where: {
                             consultation: ctx.request.body.consultationId
-                        },
-                        data: {
-                            status: 'available',
-                        },
-                    });
-
-                    const equipmentsHistories = await strapi.db.query('api::equipment-history.equipment-history').updateMany({
-                        where: {
-                            consultation: ctx.request.body.consultationId
-                        },
-                        data: {
-                            status: 'available',
                         }
                     });
 
+                    
+                     const updateConsultingRoomsHistories = await Promise.all(consultingRoomsHistories.map(async (consultingRoomsHistory) => {
+                        const updateHistory = await strapi.db.query('api::consulting-room-history.consulting-room-history').update({
+                            where: {
+                                id: consultingRoomsHistory.id
+                            },
+                            data: {
+                                status: 'available',
+                            },
+                        });
+
+                        return updateHistory;
+                     }));
+
+
+                console.log(updateConsultingRoomsHistories);
+
+                const equitmentsHistories = await strapi.db.query('api::equipment-history.equipment-history').findMany({
+                    where: {
+                        consultation: ctx.request.body.consultationId
+                    }
+                });
+
+                const updateEquitmentHistories = await Promise.all(equitmentsHistories.map(async (equitmentsHistory) => {
+                    const updateHistory = await strapi.db.query('api::consulting-room-history.consulting-room-history').update({
+                        where: {
+                            id: equitmentsHistory.id
+                        },
+                        data: {
+                            status: 'available',
+                        },
+                    });
+
+                    return updateHistory;
+                 }));
+
+
+                console.log(updateEquitmentHistories);
+
+
                     if (cancelConsultation &&
-                        consultingsRoomsHistories &&
-                        equipmentsHistories
+                        updateConsultingRoomsHistories &&
+                        updateEquitmentHistories
                     ) {
 
                         ctx.response.status = 200;

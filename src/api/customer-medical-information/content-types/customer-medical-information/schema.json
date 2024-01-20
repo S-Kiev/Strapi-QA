@@ -4,16 +4,14 @@
   "info": {
     "singularName": "customer-medical-information",
     "pluralName": "customer-medical-informations",
-    "displayName": "customerMedicalInformation"
+    "displayName": "customerMedicalInformation",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
   },
   "pluginOptions": {},
   "attributes": {
-    "customerMedicalInformationId": {
-      "type": "uid"
-    },
     "customer": {
       "type": "relation",
       "relation": "oneToOne",
@@ -21,12 +19,13 @@
       "inversedBy": "medicalInformation"
     },
     "informedConsent": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
       "allowedTypes": [
         "images",
         "files"
-      ],
-      "type": "media",
-      "multiple": false
+      ]
     },
     "medication": {
       "type": "string"

@@ -12,9 +12,6 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "customerId": {
-      "type": "uid"
-    },
     "name": {
       "type": "string",
       "required": true

@@ -4,16 +4,14 @@
   "info": {
     "singularName": "equipment-history",
     "pluralName": "equipment-histories",
-    "displayName": "equipmentHistory"
+    "displayName": "equipmentHistory",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
   },
   "pluginOptions": {},
   "attributes": {
-    "equipmentHistoryId": {
-      "type": "uid"
-    },
     "equipment": {
       "type": "relation",
       "relation": "oneToOne",
@@ -34,6 +32,15 @@
     },
     "until": {
       "type": "datetime"
+    },
+    "consultation": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::consultation.consultation"
+    },
+    "canceledRental": {
+      "type": "boolean",
+      "default": false
     }
   }
 }

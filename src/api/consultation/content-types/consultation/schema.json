@@ -12,9 +12,6 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "consultationId": {
-      "type": "uid"
-    },
     "customer": {
       "type": "relation",
       "relation": "oneToOne",
@@ -25,10 +22,6 @@
       "relation": "oneToMany",
       "target": "api::treatment.treatment"
     },
-    "extraConsultingRoom": {
-      "type": "boolean",
-      "default": false
-    },
     "responsibleUser": {
       "type": "relation",
       "relation": "oneToOne",
@@ -36,6 +29,28 @@
     },
     "comments": {
       "type": "text"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "pending",
+        "in progress",
+        "finish",
+        "cancel"
+      ],
+      "default": "pending"
+    },
+    "since": {
+      "type": "datetime"
+    },
+    "until": {
+      "type": "datetime"
+    },
+    "notifyCustomer": {
+      "type": "boolean"
+    },
+    "notifyUser": {
+      "type": "boolean"
     }
   }
 }

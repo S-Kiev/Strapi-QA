@@ -4,7 +4,8 @@
   "info": {
     "singularName": "consultation-consulting-room",
     "pluralName": "consultation-consulting-rooms",
-    "displayName": "consultation-consultingRoom "
+    "displayName": "consultation-consultingRoom ",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -26,6 +27,12 @@
     },
     "until": {
       "type": "datetime"
+    },
+    "notifyCustomer": {
+      "type": "boolean"
+    },
+    "notifyUser": {
+      "type": "boolean"
     }
   }
 }

@@ -12,9 +12,6 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "userId": {
-      "type": "uid"
-    },
     "name": {
       "type": "string",
       "required": true
@@ -31,11 +28,6 @@
       "type": "string",
       "required": true
     },
-    "adminUser": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "admin::user"
-    },
     "city": {
       "type": "relation",
       "relation": "oneToOne",
@@ -45,27 +37,13 @@
       "type": "string",
       "required": true
     },
-    "state": {
-      "type": "enumeration",
-      "enum": [
-        "enabled",
-        "locked",
-        "low"
-      ],
-      "required": true,
-      "default": "enabled"
-    },
     "deactivationDate": {
       "type": "datetime"
     },
-    "activeHoursSince": {
-      "type": "datetime"
-    },
-    "activeHoursUntil": {
-      "type": "datetime"
-    },
-    "daysActiveHours": {
-      "type": "json"
+    "userId": {
+      "type": "integer",
+      "required": true,
+      "unique": true
     }
   }
 }

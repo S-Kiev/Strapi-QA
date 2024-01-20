@@ -28,11 +28,6 @@
       "type": "string",
       "required": true
     },
-    "adminUser": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "admin::user"
-    },
     "city": {
       "type": "relation",
       "relation": "oneToOne",
@@ -44,6 +39,11 @@
     },
     "deactivationDate": {
       "type": "datetime"
+    },
+    "userId": {
+      "type": "integer",
+      "required": true,
+      "unique": true
     }
   }
 }

@@ -1329,11 +1329,6 @@ export interface ApiUserDataUserData extends Schema.CollectionType {
     lastname: Attribute.String & Attribute.Required;
     document: Attribute.String & Attribute.Required;
     cellphone: Attribute.String & Attribute.Required;
-    adminUser: Attribute.Relation<
-      'api::user-data.user-data',
-      'oneToOne',
-      'admin::user'
-    >;
     city: Attribute.Relation<
       'api::user-data.user-data',
       'oneToOne',
@@ -1341,6 +1336,7 @@ export interface ApiUserDataUserData extends Schema.CollectionType {
     >;
     address: Attribute.String & Attribute.Required;
     deactivationDate: Attribute.DateTime;
+    userId: Attribute.Integer & Attribute.Required & Attribute.Unique;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

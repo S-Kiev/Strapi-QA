@@ -785,7 +785,9 @@ module.exports = (plugin) => {
                 ctx.request.body.dateSince &&
                 ctx.request.body.dateUntil &&
                 ctx.request.body.treatments &&
+                ctx.request.body.equitments &&
                 ctx.request.body.treatments.length > 0 &&
+                ctx.request.body.equitments.length > 0 &&
                 ctx.request.body.consultingsRooms &&
                 ctx.request.body.consultingsRooms.length > 0
             ) {
@@ -796,10 +798,14 @@ module.exports = (plugin) => {
                 // SI LAS FECHAS NO VIENEN EN EL FORMATO DATE TIME ('AAAA-MM-DDTHH:MM:SS'), Y LA DECHA HASTA NO ES MAYOR A DESDE NO PASA
                 if (!isNaN(dateSince.getTime()) && !isNaN(dateUntil.getTime()) && ((dateUntil.getTime()) > (dateSince.getTime()))) {
 
-                    const consultingRoomsInThisTimeRange = await Promise.all(ctx.request.body.consultingsRooms.map(async consultingsRoom => {
+                    var message = "";
+           
+                    const consultingRoomsInThisTimeRange = [];
+
+                    for (const consultingsRoom of ctx.request.body.consultingsRooms) {
                         const consultingRomms = await strapi.db.query('api::consultation-consulting-room.consultation-consulting-room').findOne({
                             where: {
-                                consultingRoom: consultingsRoom.id,
+                                consultingRoom: consultingsRoom?.id,
                                 $or: [
                                     {
                                         since: {
@@ -828,29 +834,30 @@ module.exports = (plugin) => {
                                 consultingRoom: true
                             }
                         });
-
-                        return consultingRomms;
-                    }));
-
+                    
+                        consultingRoomsInThisTimeRange.push(consultingRomms);
+                    }
+                    
                     var flag = true;
-
+                    
                     console.log(consultingRoomsInThisTimeRange);
+                    
 
                     //como no pude filtrar en en el populate las consultas canceladas
                     if (consultingRoomsInThisTimeRange.some(room => room !== null)) {
 
                         await Promise.all(consultingRoomsInThisTimeRange.map(async consultingRoomInThisTimeRange => {
+                            console.log(consultingRoomInThisTimeRange);
                             //Si es pendiente o en proceso entonces no se puede agendar
-                            if (consultingRoomInThisTimeRange.consultation.status != 'cancel') {
-                                flag = false;
-                            }
+                            flag = consultingRoomInThisTimeRange && consultingRoomInThisTimeRange.consultation && consultingRoomInThisTimeRange.consultation.status !== 'cancel' ? false : true;
                         }));
 
 
                         const consultingRoomsHistory = await Promise.all(consultingRoomsInThisTimeRange.map(async consultingRoomInThisTimeRange => {
+                            console.log(consultingRoomInThisTimeRange);
                             const consultingRoomHistory = await strapi.db.query('api::consulting-room-history.consulting-room-history').findOne({
                                 where: {
-                                    consulting_room: consultingRoomInThisTimeRange.consultingRoom.id,
+                                    consulting_room: consultingRoomInThisTimeRange.consultingRoom?.id,
                                     $or: [
                                         {
                                             since: {
@@ -885,17 +892,15 @@ module.exports = (plugin) => {
                         if (consultingRoomsHistory.some(equitment => equitment !== null)) {
                             await Promise.all(consultingRoomsHistory.map(async consultingRoom => {
                                 //Si es el consultorio no esta disponible porque ya esta ocupado o fuera de servicio no se puede registrar
-                                if (consultingRoom.status != 'available') {
-                                    flag = false;
-                                }
+                                flag = consultingRoom?.status != 'cancel' ? false : true;
                             }));
                         }
 
 
-                        const equitmentsOcuppiedInThisTimeRange = await Promise.all(consultingRoomsInThisTimeRange.map(async consultingRoomInThisTimeRange => {
+                        const equitmentsOcuppiedInThisTimeRange = await Promise.all(ctx.request.body.equitments.map(async consultingRoomInThisTimeRange => {
                             const equitmentHistory = await strapi.db.query('api::equipment-history.equipment-history').findOne({
                                 where: {
-                                    consultation: consultingRoomInThisTimeRange.consultation.id,
+                                    equipment: consultingRoomInThisTimeRange,
                                     $or: [
                                         {
                                             since: {
@@ -931,9 +936,7 @@ module.exports = (plugin) => {
 
                             await Promise.all(equitmentsOcuppiedInThisTimeRange.map(async equitment => {
                                 //Si es el equipo no esta disponible porque ya esta ocupado o alquilado entonces no se puede registrar
-                                if (equitment.status != 'available') {
-                                    flag = false;
-                                }
+                                flag = equitment?.status != 'available' ? false : true;
                             }));
                         }
                     }
@@ -975,69 +978,58 @@ module.exports = (plugin) => {
                                         status: 'pending',
                                         since: dateSince,
                                         until: dateUntil,
+                                        notifyCustomer: false,
+                                        notifyUser: false,
                                         publishedAt: new Date()
                                     },
                                 });
 
-                                const consultationsConsultingsRooms = await Promise.all(ctx.request.body.consultingsRooms.map(async consultingRoom => {
+                                const consultationsConsultingsRooms = [];
+
+                                // Iterar sobre cada consultorio especificado en la solicitud
+                                for (const consultingRoom of ctx.request.body.consultingsRooms) {
                                     const consultationConsultingRoom = await strapi.db.query('api::consultation-consulting-room.consultation-consulting-room').create({
                                         data: {
                                             consultation: newConsultation.id,
-                                            consultingRoom: consultingRoom.id,
-                                            since: consultingRoom.dateSince,
-                                            until: consultingRoom.dateUntil,
+                                            consultingRoom: consultingRoom?.id,
+                                            since: consultingRoom?.dateSince,
+                                            until: consultingRoom?.dateUntil,
                                             publishedAt: new Date()
                                         },
                                     });
-                                    return consultationConsultingRoom
-                                }));
+                                
+                                    consultationsConsultingsRooms.push(consultationConsultingRoom);
+                                }
 
                                 //Verificar que no haya registros en los historiales de consulting-room-history con consultorios ocupados
                                 const consultingRoomsHistories = await Promise.all(ctx.request.body.consultingsRooms.map(async consultingRoom => {
                                     const consultingRoomHistory = await strapi.db.query('api::consulting-room-history.consulting-room-history').create({
                                         data: {
-                                            consulting_room: consultingRoom.id,
+                                            consulting_room: consultingRoom?.id,
                                             consultation: newConsultation.id,
                                             status: 'occupied',
-                                            since: consultingRoom.dateSince,
-                                            until: consultingRoom.dateUntil,
+                                            since: consultingRoom?.dateSince,
+                                            until: consultingRoom?.dateUntil,
                                             publishedAt: new Date()
                                         },
                                     });
                                     return consultingRoomHistory
                                 }));
 
+                                const equipmentHistories = await Promise.all(ctx.request.body.equitments.map(async equitment => {
+                                    const equitmentHistory = await strapi.db.query('api::equipment-history.equipment-history').create({
+                                        data: {
+                                            equipment: equitment,
+                                            status: 'occupied',
+                                            consultation: newConsultation.id,
+                                            since: dateSince,
+                                            until: dateUntil,
+                                            publishedAt: new Date()
+                                        },
+                                    });
+                                    return equitmentHistory
+                                }));
 
-                                //Verificar que no haya registros en los historiales de equipment-history con consultorios ocupados
-                                const equipmentHistoryPromises = [];
-
-                                // Recorre cada tratamiento en el array
-                                treatments.forEach(treatment => {
-                                    // Verifica si el tratamiento tiene equipos
-                                    if (treatment.equipments && treatment.equipments.length > 0) {
-                                        // Recorre cada equipo en el tratamiento
-                                        treatment.equipments.forEach(async equipment => {
-                                            // Crea un registro en equipment-history para cada equipo
-                                            const equipmentHistoryPromise = strapi.db.query('api::equipment-history.equipment-history').create({
-                                                data: {
-                                                    equipment: equipment.id,
-                                                    status: 'occupied',
-                                                    consultation: newConsultation.id,
-                                                    // tiene que ser el desde y hasta de la consulta?
-                                                    since: dateSince,
-                                                    until: dateUntil,
-                                                    publishedAt: new Date()
-                                                },
-                                            });
-
-                                            // Agrega la promesa al array de promesas
-                                            equipmentHistoryPromises.push(equipmentHistoryPromise);
-                                        });
-                                    }
-                                });
-
-                                // Espera a que se completen todas las promesas antes de continuar
-                                const equipmentHistories = await Promise.all(equipmentHistoryPromises);
 
                                 if (newConsultation &&
                                     consultationsConsultingsRooms &&
@@ -1164,6 +1156,10 @@ module.exports = (plugin) => {
                 });
 
                 console.log(consultation);
+                console.log(consultationConsultingRooms);
+                console.log(consultingRoomHistories);
+                console.log(equipmentHistory);
+
                 if (consultation) {
 
                     //Se quiere modificar fechas?
@@ -1203,7 +1199,6 @@ module.exports = (plugin) => {
                         console.log(consultationsInThisTimeRange);
 
                         if (consultationsInThisTimeRange.some(consultation => consultation !== null)) {
-                            console.log("Entro aca");
                              flag = true;
                              message = "ya hay una consulta en ese rango horario";
                         }
@@ -1245,7 +1240,7 @@ module.exports = (plugin) => {
                         if (consultationConsultingRoomsInThisTimeRange.some(consultation => consultation !== null)) {
                             console.log("Entro aca");
                             flag = true;
-                            message =`${message}, ya hay registros en consultationConsultingRoom en ese rango horario`;
+                            message =`${message}, ya ese consultorio esta ocupado en ese rango horario`;
                         }
 
                         const consultingRoomHistoriesInThisTimeRange = await Promise.all(consultingRoomHistories.map(async consultingRoomHistory => {
@@ -1343,17 +1338,21 @@ module.exports = (plugin) => {
 
                     //Pasamos a modificar los registros
                     try {
+                        console.log("Quiere modificar");
                         const updateConsultation = await strapi.db.query('api::consultation.consultation').update({
                             where: {
                                 id: ctx.request.body.consultationId
                             },
                             data: {
-                                treatments: ctx.request.body.treatments?.map(treatment => treatment.id) ?? consultation.treatments,
+                                treatments: ctx.request.body.treatments?.forEach(treatment => treatment) ?? consultation.treatments,
                                 comments: ctx.request.body.comments ?? consultation.comments,
-                                consultingRooms: ctx.request.body.consultingsRooms.map(consultingRoom => consultingRoom.id) ?? consultation.consultingRooms,
+                                customer: ctx.request.body.customerId ?? consultation.customer,
+                                responsibleUser: ctx.request.body.responsibleUserId ?? consultation.responsibleUser,
                                 status: ctx.request.body.status ?? consultation.status,
                                 since: ctx.request.body.dateSince ?? consultation.since,
-                                until: ctx.request.body.dateUntil ?? consultation.until
+                                until: ctx.request.body.dateUntil ?? consultation.until,
+                                notifyCustomer: ctx.request.body.notifyCustomer ?? consultation.notifyCustomer,
+                                notifyUser: ctx.request.body.notifyUser ?? consultation.notifyUser
                             },
                         });
 
@@ -1370,7 +1369,7 @@ module.exports = (plugin) => {
                                         consultation: ctx.request.body.consultationId
                                     },
                                     data: {
-                                        consultingRoom: consultingRoom.consultingRoom,
+                                        consultingRoom: consultingRoom.id,
                                         since: consultingRoom.dateSince,
                                         until: consultingRoom.dateUntil,
                                     },
@@ -1399,48 +1398,24 @@ module.exports = (plugin) => {
                             console.log(consultingRoomsHistories)
                         }
 
-                        let equipmentHistories = [];
-                        if (ctx.request.body.treatments) {
-                            const equipmentHistoryPromises = [];
-
-                            const treatments = await Promise.all(ctx.request.body.treatments.map(async treatment => {
-                                const treatmentWithEquitment = await strapi.db.query('api::treatment.treatment').findOne({
+                        let equipmentHistories;
+                        if (ctx.request.body.equitments){
+                            equipmentHistories = await Promise.all(ctx.request.body.equitments.map(async equitment => {
+                                console.log(equitment)
+                                const equitmentHistory = await strapi.db.query('api::equipment-history.equipment-history').update({
                                     where: {
-                                        id: treatment.id
+                                        consultation: ctx.request.body.consultationId
                                     },
-                                    populate: {
-                                        equipments: true
-                                    }
+                                    data: {
+                                        equipment: equitment?.id,
+                                        status: equitment?.status,
+                                        since: equitment?.dateSince,
+                                        until: equitment?.dateUntil,
+                                        publishedAt: new Date()
+                                    },
                                 });
-                                return treatmentWithEquitment
+                                return equitmentHistory
                             }));
-
-                            console.log(treatments);
-
-                            for (const treatment of treatments) {
-                                console.log(treatment.equipments)
-                                if (treatment.equipments && treatment.equipments.length > 0) {
-                                    for (const equipment of treatment.equipments) {
-                                        const equipmentHistoryPromise = strapi.db.query('api::equipment-history.equipment-history').update({
-                                            where: {
-                                                equipment: equipment.id,
-                                                consultation: ctx.request.body.consultationId
-                                            },
-                                            data: {
-                                                status: treatment.equitmentStatus,
-                                                since: treatment.dateSince,
-                                                until: treatment.dateUntil,
-                                            },
-                                        });
-
-                                        equipmentHistoryPromises.push(equipmentHistoryPromise);
-                                    }
-                                }
-                            }
-
-                            console.log(equipmentHistoryPromises);
-
-                            equipmentHistories = await Promise.all(equipmentHistoryPromises);
                         }
 
                         ctx.response.status = 200;
@@ -1456,7 +1431,7 @@ module.exports = (plugin) => {
                             await strapi.db.query('api::equipment-history.equipment-history').update({
                                 where: { id: equitmentHistory.id },
                                 data: {
-                                    equipment: equitmentHistory.equitment.id,
+                                    equipment: equitmentHistory.equipment.id,
                                     consultation: equitmentHistory.consultation.id,
                                     status: equitmentHistory.status,
                                     since: equitmentHistory.since,
@@ -1743,6 +1718,7 @@ module.exports = (plugin) => {
         }
     }
 
+    
     plugin.controllers.user.simpleDeleteConsultingRoomHistory = async (ctx) => {
         try {
                 const today = new Date();
@@ -1804,6 +1780,7 @@ module.exports = (plugin) => {
             }
         }
     }
+    
 
 
     plugin.routes['content-api'].routes.push(
@@ -1835,18 +1812,18 @@ module.exports = (plugin) => {
             },
         },
         {
-            method: "POST",
-            path: "/consultation/simlpleCreateConsultation",
-            handler: "user.simlpleCreateConsultation",
+            method: "PUT",
+            path: "/consultation/cancelConsultation",
+            handler: "user.cancelConsultation",
             config: {
                 prefix: "",
                 policies: []
             },
         },
         {
-            method: "PUT",
-            path: "/consultation/cancelConsultation",
-            handler: "user.cancelConsultation",
+            method: "POST",
+            path: "/consultation/simlpleCreateConsultation",
+            handler: "user.simlpleCreateConsultation",
             config: {
                 prefix: "",
                 policies: []

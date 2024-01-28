@@ -133,26 +133,26 @@ module.exports = {
             const thisMoment = new Date();
 
             //Cambiar a esta fuente: 'api::consultation.consultation'
-            const historyConsultationConsultingRooms = await strapi.db.query('api::consultation-consulting-room.consultation-consulting-room').findMany({
+            const consultations = await strapi.db.query('api::consultation.consultation').findMany({
                 where: {
                     since: {
                         $lte: thisMoment
                     },
                     until: {
                         $gte: thisMoment
+                    },
+                    status: {
+                        $eq: 'pending'
                     }
-                },
-                populate: {
-                    consultation: true
                 }
             });
 
 
-            if (historyConsultationConsultingRooms.length > 0){
-                await Promise.all(historyConsultationConsultingRooms.map(historyConsultationConsultingRoom => {
+            if (consultations.length > 0){
+                await Promise.all(consultations.map(consultation => {
                     return strapi.db.query('api::consultation.consultation').update({
                         where: {
-                            id : historyConsultationConsultingRoom.consultation.id,
+                            id : consultation.id,
                             status : 'pending'
                         },
                         data:
@@ -171,24 +171,23 @@ module.exports = {
         task: async function ({ strapi }) {
             const thisMoment = new Date();
 
-            const historyConsultationConsultingRooms = await strapi.db.query('api::consultation-consulting-room.consultation-consulting-room').findMany({
+            const completedConsultations = await strapi.db.query('api::consultation.consultation').findMany({
                 where: {
                     until: {
                         $lte: thisMoment
+                    },
+                    status: {
+                        $eq: 'in progress'
                     }
-                },
-                populate: {
-                    consultation: true
                 }
             });
 
             
-            if (historyConsultationConsultingRooms.length > 0){
-                await Promise.all(historyConsultationConsultingRooms.map(historyConsultationConsultingRoom => {
+            if (completedConsultations.length > 0){
+                await Promise.all(completedConsultations.map(consultation => {
                     return strapi.db.query('api::consultation.consultation').update({
                         where: {
-                            id: historyConsultationConsultingRoom.consultation.id,
-                            status : 'in progress'
+                            id: consultation.id
                         },
                         data:
                             { status: 'finish' }

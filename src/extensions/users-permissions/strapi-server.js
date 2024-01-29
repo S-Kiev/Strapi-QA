@@ -798,8 +798,8 @@ module.exports = (plugin) => {
                 // SI LAS FECHAS NO VIENEN EN EL FORMATO DATE TIME ('AAAA-MM-DDTHH:MM:SS'), Y LA DECHA HASTA NO ES MAYOR A DESDE NO PASA
                 if (!isNaN(dateSince.getTime()) && !isNaN(dateUntil.getTime()) && ((dateUntil.getTime()) > (dateSince.getTime()))) {
 
-                    var message = "";
-           
+                    var equitmentsOcuppiedInThisTimeRange;
+                    var consultingRoomsHistory;
                     const consultingRoomsInThisTimeRange = [];
 
                     for (const consultingsRoom of ctx.request.body.consultingsRooms) {
@@ -853,7 +853,7 @@ module.exports = (plugin) => {
                         }));
 
 
-                        const consultingRoomsHistory = await Promise.all(consultingRoomsInThisTimeRange.map(async consultingRoomInThisTimeRange => {
+                        consultingRoomsHistory = await Promise.all(consultingRoomsInThisTimeRange.map(async consultingRoomInThisTimeRange => {
                             console.log(consultingRoomInThisTimeRange);
                             const consultingRoomHistory = await strapi.db.query('api::consulting-room-history.consulting-room-history').findOne({
                                 where: {
@@ -882,7 +882,8 @@ module.exports = (plugin) => {
                                     ]
                                 },
                                 populate: {
-                                    consultation: true
+                                    consultation: true,
+                                    consulting_room: true
                                 }
                             });
 
@@ -897,7 +898,7 @@ module.exports = (plugin) => {
                         }
 
 
-                        const equitmentsOcuppiedInThisTimeRange = await Promise.all(ctx.request.body.equitments.map(async consultingRoomInThisTimeRange => {
+                        equitmentsOcuppiedInThisTimeRange = await Promise.all(ctx.request.body.equitments.map(async consultingRoomInThisTimeRange => {
                             const equitmentHistory = await strapi.db.query('api::equipment-history.equipment-history').findOne({
                                 where: {
                                     equipment: consultingRoomInThisTimeRange,
@@ -925,7 +926,8 @@ module.exports = (plugin) => {
                                     ]
                                 },
                                 populate: {
-                                    consultation: true
+                                    consultation: true,
+                                    equipment: true
                                 }
                             });
 
@@ -941,9 +943,34 @@ module.exports = (plugin) => {
                         }
                     }
 
+                    if(!flag && equitmentsOcuppiedInThisTimeRange.length > 0 && consultingRoomsHistory.length > 0) {
 
+                        const equipmentsOccupied = equitmentsOcuppiedInThisTimeRange
+                        .filter(equitment => equitment !== null && equitment.status === 'available')
+                        .map(equitment => equitment.equipment);
 
-                    //VALIDACIONES DE LOS HISTORIALES
+                        const consultingRoomsOccupied = consultingRoomsHistory
+                        .filter(consultingRoom => consultingRoom !== null && consultingRoom.status === 'available')
+                        .map(consultingRoom => consultingRoom.consulting_room);
+
+                        let message = "Error al crear los registros";
+
+                        if (equipmentsOccupied.length > 0 && consultingRoomsOccupied.length > 0) {
+                          message = "Algunos equipos y salas de consulta están ocupados";
+                        } else if (equipmentsOccupied.length > 0) {
+                          message = "Algunos equipos están ocupados";
+                        } else if (consultingRoomsOccupied.length > 0) {
+                          message = "Algunas salas de consulta están ocupadas";
+                        }
+
+                        ctx.response.status = 405;
+                        ctx.response.body = {
+                            message: message,
+                            equipments: equipmentsOccupied ?? [],
+                            consultingRooms: consultingRoomsOccupied ?? []
+                        }
+                        return
+                    }
 
                     if (flag) {
                         try {
@@ -1243,7 +1270,7 @@ module.exports = (plugin) => {
                             message =`${message}, ya ese consultorio esta ocupado en ese rango horario`;
                         }
 
-                        const consultingRoomHistoriesInThisTimeRange = await Promise.all(consultingRoomHistories.map(async consultingRoomHistory => {
+                        let consultingRoomHistoriesInThisTimeRange = await Promise.all(consultingRoomHistories.map(async consultingRoomHistory => {
                             const consultingRoomHistoies = await strapi.db.query('api::consulting-room-history.consulting-room-history').findOne({
                                 where: {
                                     id: { $ne: consultation.id },
@@ -1270,6 +1297,9 @@ module.exports = (plugin) => {
                                             }
                                         }
                                     ]
+                                },
+                                populate: {
+                                    consulting_room: true
                                 }
                             });
 
@@ -1311,6 +1341,9 @@ module.exports = (plugin) => {
                                             }
                                         }
                                     ]
+                                },
+                                populate: {
+                                    equipment: true
                                 }
                             });
 
@@ -1324,6 +1357,39 @@ module.exports = (plugin) => {
                             flag = true;
                             message = message = `${message}, ya hay registros en el historial de equipos en ese rango horario`;
                         }
+
+                        // Si encontro registros de equipos y consultorios retornanrlos en la respuesta
+                        
+                        
+                        if(!flag && equipmentHistoriesInThisTimeRange.length > 0 && consultingRoomHistoriesInThisTimeRange.length > 0) {
+
+                            const equipmentsOccupied = equipmentHistoriesInThisTimeRange
+                            .filter(equitment => equitment !== null && equitment.status === 'available')
+                            .map(equitment => equitment.equipment);
+
+                            const consultingRoomsOccupied = consultingRoomHistoriesInThisTimeRange
+                            .filter(consultingRoom => consultingRoom !== null && consultingRoom.status === 'available')
+                            .map(consultingRoom => consultingRoom.consulting_room);
+
+                            let message = "Error al modificar los registros";
+
+                            if (equipmentsOccupied.length > 0 && consultingRoomsOccupied.length > 0) {
+                            message = "Algunos equipos y salas de consulta están ocupados";
+                            } else if (equipmentsOccupied.length > 0) {
+                            message = "Algunos equipos están ocupados";
+                            } else if (consultingRoomsOccupied.length > 0) {
+                            message = "Algunas salas de consulta están ocupadas";
+                            }
+
+                            ctx.response.status = 405;
+                            ctx.response.body = {
+                                message: message,
+                                equipments: equipmentsOccupied ?? [],
+                                consultingRooms: consultingRoomsOccupied ?? []
+                            }
+                            return
+                        }
+                        
 
                         //Si encontro registros que se solapan con los horarios entonces detener la ejecucion
                         if (flag) {

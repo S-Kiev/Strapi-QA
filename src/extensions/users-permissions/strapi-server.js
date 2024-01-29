@@ -946,11 +946,11 @@ module.exports = (plugin) => {
                     if( (equitmentsOcuppiedInThisTimeRange && equitmentsOcuppiedInThisTimeRange.length > 0) || (consultingRoomsHistory && consultingRoomsHistory.length > 0) ) {
 
                         const equipmentsOccupied = equitmentsOcuppiedInThisTimeRange
-                        .filter(equitment => equitment !== null && equitment.status === 'available')
+                        .filter(equitment => equitment !== null && equitment.status !== 'available')
                         .map(equitment => equitment.equipment);
 
                         const consultingRoomsOccupied = consultingRoomsHistory
-                        .filter(consultingRoom => consultingRoom !== null && consultingRoom.status === 'available')
+                        .filter(consultingRoom => consultingRoom !== null && consultingRoom.status !== 'available')
                         .map(consultingRoom => consultingRoom.consulting_room);
 
                         let message = "Error al crear los registros";
@@ -1364,11 +1364,11 @@ module.exports = (plugin) => {
                         if((equipmentHistoriesInThisTimeRange && equipmentHistoriesInThisTimeRange.length > 0) || (consultingRoomHistoriesInThisTimeRange && consultingRoomHistoriesInThisTimeRange.length > 0) ) {
 
                             const equipmentsOccupied = equipmentHistoriesInThisTimeRange
-                            .filter(equitment => equitment !== null && equitment.status === 'available')
+                            .filter(equitment => equitment !== null && equitment.status !== 'available')
                             .map(equitment => equitment.equipment);
 
                             const consultingRoomsOccupied = consultingRoomHistoriesInThisTimeRange
-                            .filter(consultingRoom => consultingRoom !== null && consultingRoom.status === 'available')
+                            .filter(consultingRoom => consultingRoom !== null && consultingRoom.status !== 'available')
                             .map(consultingRoom => consultingRoom.consulting_room);
 
                             let message = "Error al modificar los registros";

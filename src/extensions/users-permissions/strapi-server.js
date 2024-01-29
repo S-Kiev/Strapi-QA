@@ -943,7 +943,7 @@ module.exports = (plugin) => {
                         }
                     }
 
-                    if(equitmentsOcuppiedInThisTimeRange.length > 0 || consultingRoomsHistory.length > 0) {
+                    if( (equitmentsOcuppiedInThisTimeRange && equitmentsOcuppiedInThisTimeRange.length > 0) || (consultingRoomsHistory && consultingRoomsHistory.length > 0) ) {
 
                         const equipmentsOccupied = equitmentsOcuppiedInThisTimeRange
                         .filter(equitment => equitment !== null && equitment.status === 'available')
@@ -1361,7 +1361,7 @@ module.exports = (plugin) => {
                         // Si encontro registros de equipos y consultorios retornanrlos en la respuesta
                         
                         
-                        if(equipmentHistoriesInThisTimeRange.length > 0 || consultingRoomHistoriesInThisTimeRange.length > 0) {
+                        if((equipmentHistoriesInThisTimeRange && equipmentHistoriesInThisTimeRange.length > 0) || (consultingRoomHistoriesInThisTimeRange && consultingRoomHistoriesInThisTimeRange.length > 0) ) {
 
                             const equipmentsOccupied = equipmentHistoriesInThisTimeRange
                             .filter(equitment => equitment !== null && equitment.status === 'available')

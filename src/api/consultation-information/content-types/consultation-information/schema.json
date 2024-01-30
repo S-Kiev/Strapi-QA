@@ -20,11 +20,6 @@
     "observationsConsultation": {
       "type": "text"
     },
-    "measures": {
-      "type": "boolean",
-      "default": false,
-      "required": true
-    },
     "images": {
       "type": "media",
       "multiple": true,
@@ -32,6 +27,11 @@
       "allowedTypes": [
         "images"
       ]
+    },
+    "measurements": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::measurements-customer.measurements-customer"
     }
   }
 }

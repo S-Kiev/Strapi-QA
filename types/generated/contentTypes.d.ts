@@ -818,10 +818,12 @@ export interface ApiConsultationInformationConsultationInformation
       'api::consultation.consultation'
     >;
     observationsConsultation: Attribute.Text;
-    measures: Attribute.Boolean &
-      Attribute.Required &
-      Attribute.DefaultTo<false>;
     images: Attribute.Media;
+    measurements: Attribute.Relation<
+      'api::consultation-information.consultation-information',
+      'oneToOne',
+      'api::measurements-customer.measurements-customer'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

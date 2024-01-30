@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2024-01-27T14:39:41.766Z"
+    "x-generation-date": "2024-01-30T17:31:49.039Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -3522,9 +3522,6 @@
         ],
         "properties": {
           "data": {
-            "required": [
-              "measures"
-            ],
             "type": "object",
             "properties": {
               "consultation": {
@@ -3541,9 +3538,6 @@
               "observationsConsultation": {
                 "type": "string"
               },
-              "measures": {
-                "type": "boolean"
-              },
               "images": {
                 "type": "array",
                 "items": {
@@ -3557,6 +3551,17 @@
                   ],
                   "example": "string or id"
                 }
+              },
+              "measurements": {
+                "oneOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ],
+                "example": "string or id"
               }
             }
           }
@@ -3610,9 +3615,6 @@
       },
       "ConsultationInformation": {
         "type": "object",
-        "required": [
-          "measures"
-        ],
         "properties": {
           "consultation": {
             "type": "object",
@@ -4969,9 +4971,6 @@
           "observationsConsultation": {
             "type": "string"
           },
-          "measures": {
-            "type": "boolean"
-          },
           "images": {
             "type": "object",
             "properties": {
@@ -5103,6 +5102,120 @@
                                   "type": "object",
                                   "properties": {}
                                 }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "measurements": {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "number"
+                  },
+                  "attributes": {
+                    "type": "object",
+                    "properties": {
+                      "consultation": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "number"
+                              },
+                              "attributes": {
+                                "type": "object",
+                                "properties": {}
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "customer": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "number"
+                              },
+                              "attributes": {
+                                "type": "object",
+                                "properties": {}
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "highWaist": {
+                        "type": "number",
+                        "format": "float"
+                      },
+                      "mean": {
+                        "type": "number",
+                        "format": "float"
+                      },
+                      "navelLine": {
+                        "type": "number",
+                        "format": "float"
+                      },
+                      "lowerBelly": {
+                        "type": "number",
+                        "format": "float"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "publishedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "createdBy": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "number"
+                              },
+                              "attributes": {
+                                "type": "object",
+                                "properties": {}
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "updatedBy": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "number"
+                              },
+                              "attributes": {
+                                "type": "object",
+                                "properties": {}
                               }
                             }
                           }

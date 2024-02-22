@@ -368,12 +368,11 @@ module.exports = (plugin) => {
                                                                 treatments.forEach(treatment => {
                                                                     // Verifica si el tratamiento tiene equipos
                                                                     if (treatment.equipments && treatment.equipments.length > 0) {
-                                                                        // Recorre cada equipo en el tratamiento
-                                                                        treatment.equipments.forEach(async equipment => {
+                                                                        // Mapea los equipos del tratamiento a promesas de historial de equipos
+                                                                        const promises = treatment.equipments.map(async equipment => {
                                                                             // Crea un registro en equipment-history para cada equipo
-                                                                            const equipmentHistoryPromise = strapi.db.query('api::equipment-history.equipment-history').create({
+                                                                            return strapi.db.query('api::equipment-history.equipment-history').create({
                                                                                 data: {
-                                                                                    //equipmentHistoryId: id, ???
                                                                                     equipment: equipment.id,
                                                                                     status: 'occupied',
                                                                                     since: dateSince,
@@ -381,15 +380,16 @@ module.exports = (plugin) => {
                                                                                     publishedAt: new Date()
                                                                                 },
                                                                             });
-
-                                                                            // Agrega la promesa al array de promesas
-                                                                            equipmentHistoryPromises.push(equipmentHistoryPromise);
                                                                         });
+                                                                
+                                                                        // Agrega las promesas al array de promesas
+                                                                        equipmentHistoryPromises.push(...promises);
                                                                     }
                                                                 });
-
+                                                                
                                                                 // Espera a que se completen todas las promesas antes de continuar
                                                                 const equipmentHistories = await Promise.all(equipmentHistoryPromises);
+                                                                
 
                                                                 if (equipmentHistories && equipmentHistories.length > 0 && consultingRoomHistory && consultationConsultingRoom && newConsultation) {
                                                                     ctx.response.status = 200;

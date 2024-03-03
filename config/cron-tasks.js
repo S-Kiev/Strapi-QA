@@ -174,7 +174,7 @@ module.exports = {
             const completedConsultations = await strapi.db.query('api::consultation.consultation').findMany({
                 where: {
                     until: {
-                        $lte: thisMoment
+                        $gte: thisMoment
                     },
                     status: {
                         $eq: 'in progress'

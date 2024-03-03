@@ -329,6 +329,8 @@ module.exports = (plugin) => {
                                                             responsibleUser: responsibleUser.id,
                                                             comments: "",
                                                             status: 'pending',
+                                                            since: dateSince,
+                                                            until: dateUntil,
                                                             notifyCustomer: false,
                                                             notifyUser: false,
                                                             publishedAt: new Date()
@@ -356,7 +358,8 @@ module.exports = (plugin) => {
                                                                     status: 'occupied',
                                                                     since: dateSince,
                                                                     until: dateUntil,
-                                                                    publishedAt: new Date()
+                                                                    publishedAt: new Date(),
+                                                                    consultation: newConsultation.id
                                                                 },
                                                             });
 
@@ -377,7 +380,8 @@ module.exports = (plugin) => {
                                                                                     status: 'occupied',
                                                                                     since: dateSince,
                                                                                     until: dateUntil,
-                                                                                    publishedAt: new Date()
+                                                                                    publishedAt: new Date(),
+                                                                                    consultation: newConsultation.id
                                                                                 },
                                                                             });
                                                                         });

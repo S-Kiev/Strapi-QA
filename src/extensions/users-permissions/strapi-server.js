@@ -1010,6 +1010,16 @@ module.exports = (plugin) => {
                                         publishedAt: new Date()
                                     },
                                 });
+                                console.log("--------------------------------------");
+
+                                console.log("dateSince:", dateSince);
+                                console.log("dateUntil:", dateUntil);
+
+
+                                console.log("--------------------------------------");
+                                console.log("newConsultation:", newConsultation);
+                                console.log("--------------------------------------");
+
 
                                 const consultationsConsultingsRooms = [];
 
